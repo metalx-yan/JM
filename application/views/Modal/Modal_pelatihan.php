@@ -9,9 +9,9 @@
       <div class="modal-body">
             
         <div class="mb-3 row">
-            <label class="col-sm-5 col-form-label">Kode Pelatihan</label>
+            <!-- <label class="col-sm-5 col-form-label">Kode Pelatihan</label> -->
             <div class="col-sm-7 form-group">
-            <input type="text" id="input-kode_pelatihan" onkeyup="key(this)" value="<?php echo (( $kode_pelatihan)? $kode_pelatihan->kode_pelatihan : '' ) ?>" name="kode_pelatihan" class="form-control" required <?php echo (( $id == 'modal_edit' || $id == 'modal_delete')? 'readonly' : '' ) ?> >
+            <input type="hidden" id="input-kode_pelatihan" onkeyup="key(this)" value="<?php echo (( $kode_pelatihan)? $kode_pelatihan->kode_pelatihan : '' ) ?>" name="kode_pelatihan" class="form-control" required <?php echo (( $id == 'modal_edit' || $id == 'modal_delete')? 'readonly' : '' ) ?> >
             <div id="error"></div>
             </div>
         </div>

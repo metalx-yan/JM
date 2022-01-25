@@ -9,9 +9,9 @@
       <div class="modal-body">
             
         <div class="mb-3 row">
-            <label class="col-sm-5 col-form-label">Kode Penyelenggara</label>
+            <!-- <label class="col-sm-5 col-form-label">Kode Penyelenggara</label> -->
             <div class="col-sm-7 form-group">
-            <input type="text" id="input-kode_penyelenggara" onkeyup="key(this)" value="<?php echo (( $kode_penyelenggara)? $kode_penyelenggara->kode_penyelenggara : '' ) ?>" name="kode_penyelenggara" class="form-control" required <?php echo (( $id == 'modal_edit' || $id == 'modal_delete')? 'readonly' : '' ) ?> >
+            <input type="hidden" id="input-kode_penyelenggara" onkeyup="key(this)" value="<?php echo (( $kode_penyelenggara)? $kode_penyelenggara->kode_penyelenggara : '' ) ?>" name="kode_penyelenggara" class="form-control" required <?php echo (( $id == 'modal_edit' || $id == 'modal_delete')? 'readonly' : '' ) ?> >
             <div id="error"></div>
             </div>
         </div>

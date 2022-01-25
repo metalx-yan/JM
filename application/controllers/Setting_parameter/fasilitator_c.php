@@ -25,8 +25,8 @@ class fasilitator_c extends CI_Controller {
     } 
 
     public function get(){
-        $query = 	"SELECT * FROM fasilitator";
-        $search = array('kode_fasilitator', 'nama_fasilitator','no_telepon','kode_vendor','kategori','id_internal','jenis_fasilitator','no_rekening','status');
+        $query = 	"SELECT kode_fasilitator, nama_fasilitator, fasilitator.no_telepon, vendor.nama, kategori, id_internal, jenis_fasilitator, no_rekening, status FROM fasilitator LEFT JOIN vendor on vendor.kode_vendor = fasilitator.kode_vendor";
+        $search = array('kode_fasilitator', 'nama_fasilitator','fasilitator.no_telepon','vendor.nama','kategori','id_internal','jenis_fasilitator','no_rekening','status');
         $where  = null; 
         // $where  = array('nama_kategori' => 'Tutorial');
         // jika memakai IS NULL pada where sql
@@ -41,9 +41,12 @@ class fasilitator_c extends CI_Controller {
         $table = 'fasilitator';
         $field = 'kode_fasilitator';
         $modal = $this->input->post('modal');
+        $on_join = 'kode_vendor';
+        $join = 'vendor';
         $id = $this->input->post('id');
         $kode_ = $this->input->post('kode_fasilitator');
-        $data['kode_fasilitator'] = $this->training_parameter->where($kode_,$table,$field)->row();
+        $data['kode_fasilitator'] = $this->training_parameter->join_($kode_,$table,$field,$join, $on_join)->row();
+        $data['vendor'] = $this->training_parameter->get_('vendor')->result_array();
         $data['modal_title'] = $modal;
         $data['id'] = $id;
         $html_modal = $this->load->view('Modal/Modal_fasilitator',$data,TRUE);
@@ -109,9 +112,14 @@ class fasilitator_c extends CI_Controller {
     function validate(){
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
-            if ($key == 'kode_fasilitator' || $key == 'no_telepon' || $key == 'kode_vendor' || $key == 'id_internal' || $key == 'no_rekening') {
+            if ($key == 'no_telepon') {
                 $require = 'required|trim|numeric';
-            }else{
+            }elseif ($key == 'kode_vendor' || $key == 'id_internal'  || $key == 'no_rekening') {
+                $require = 'numeric';
+            }elseif ($key == 'kode_fasilitator') {
+                $require = '';
+            }
+            else{
                 $require = 'required|trim';
             }
             $this->form_validation->set_rules($key,$key,$require);
@@ -136,9 +144,14 @@ class fasilitator_c extends CI_Controller {
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
             if ($key == $key) {
-                if ($key == 'kode_fasilitator' || $key == 'no_telepon' || $key == 'kode_vendor' || $key == 'id_internal' || $key == 'no_rekening') {
+                if ($key == 'no_telepon') {
                     $require = 'required|trim|numeric';
-                }else{
+                }elseif ($key == 'kode_vendor' || $key == 'id_internal'  || $key == 'no_rekening') {
+                    $require = 'numeric';
+                }elseif ($key == 'kode_fasilitator') {
+                    $require = '';
+                }
+                else{
                     $require = 'required|trim';
                 }
                 $this->form_validation->set_rules($key,$key,$require);

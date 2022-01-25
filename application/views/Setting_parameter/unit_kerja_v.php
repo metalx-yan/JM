@@ -17,8 +17,8 @@
                 <table id="manage_menu" class="table table-bordered table-striped text-center align-middle" width="100%">
                     <thead>
                         <tr class="text-center">
-                            <!-- <th scope="row">No</th> -->
-                            <th>Kode Unit Kerja</th>
+                            <th scope="row">No</th>
+                            <!-- <th>Kode Unit Kerja</th> -->
                             <th>Unit Kerja</th>
                             <th>Action</th>
                         </tr>
@@ -59,7 +59,11 @@
                 "deferRender": true,
                 "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
                 "columns": [
-                    { "data": "kode_unit" },
+                    {"data": 'kode_unit',"sortable": false, // !!! id_sort
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }  
+                    },
                     { "data": "unit_kerja" },
                     {data: null,
                         render: function (data, type, row, meta) {
@@ -137,35 +141,37 @@
         $('#error').html(" ");
         form = $("#task").serialize();
 
-        $.ajax({
-            type: "POST",
-            url: "<?php echo site_url('Setting_parameter/unit_kerja_c/validate');?>", 
-            data: form,
-            dataType: "json",  
-            success: function(data){
-                if (data.action == 'ok') {
-                    if (action == 'modal_edit') {
-                        edit(form);
-                    }else if(action == 'modal_add'){
-                        save(form);
-                    }else{
-                        delete_(form);
-                    }
-                }else{
-                    $.each(data, function(key, value) {
-                        if(value == ''){
-                            $('#input-' + key).removeClass('is-invalid');
-                            $('#input-' + key).addClass('is-valid');
-                            $('#input-' + key).parents('.form-group').find('#error').html(value);
-                        }else{
-                            $('#input-' + key).addClass('is-invalid');
-                            $('#input-' + key).parents('.form-group').find('#error').html(value);
+        if(action == 'modal_delete'){
+            delete_(form);
+        }else{
+            $.ajax({
+                type: "POST",
+                url: "<?php echo site_url('Setting_parameter/unit_kerja_c/validate');?>", 
+                data: form,
+                dataType: "json",  
+                success: function(data){
+                    if (data.action == 'ok') {
+                        if (action == 'modal_edit') {
+                            edit(form);
+                        }else if(action == 'modal_add'){
+                            save(form);
                         }
-                    });
+                    }else{
+                        $.each(data, function(key, value) {
+                            if(value == ''){
+                                $('#input-' + key).removeClass('is-invalid');
+                                $('#input-' + key).addClass('is-valid');
+                                $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            }else{
+                                $('#input-' + key).addClass('is-invalid');
+                                $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            }
+                        });
+                    }
+                    
                 }
-                
-            }
-        });
+            });
+        }
         
     }
 

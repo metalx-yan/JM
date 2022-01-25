@@ -17,11 +17,10 @@
                 <table id="manage_menu" class="table table-bordered table-striped text-center align-middle" width="100%">
                     <thead>
                         <tr class="text-center">
-                            <!-- <th scope="row">No</th> -->
-                            <th>Kode Fasilitator</th>
+                            <th scope="row">No</th>
                             <th>Nama Fasilitator</th>
                             <th>No Telepon</th>
-                            <th>Kode Vendor</th>
+                            <th>Vendor</th>
                             <th>Kategori</th>
                             <th>ID Internal</th>
                             <th>Jenis Fasilitator</th>
@@ -66,10 +65,14 @@
                 "deferRender": true,
                 "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
                 "columns": [
-                    { "data": "kode_fasilitator" },
+                    {"data": 'kode_fasilitator',"sortable": false, // !!! id_sort
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }  
+                    },
                     { "data": "nama_fasilitator" },
                     { "data": "no_telepon" },
-                    { "data": "kode_vendor" },
+                    { "data": "nama" },
                     { "data": "kategori" },
                     { "data": "id_internal" },
                     { "data": "jenis_fasilitator" },
@@ -151,35 +154,39 @@
         $('#error').html(" ");
         form = $("#task").serialize();
 
-        $.ajax({
-            type: "POST",
-            url: "<?php echo site_url('Setting_parameter/fasilitator_c/validate');?>", 
-            data: form,
-            dataType: "json",  
-            success: function(data){
-                if (data.action == 'ok') {
-                    if (action == 'modal_edit') {
-                        edit(form);
-                    }else if(action == 'modal_add'){
-                        save(form);
-                    }else{
-                        delete_(form);
-                    }
-                }else{
-                    $.each(data, function(key, value) {
-                        if(value == ''){
-                            $('#input-' + key).removeClass('is-invalid');
-                            $('#input-' + key).addClass('is-valid');
-                            $('#input-' + key).parents('.form-group').find('#error').html(value);
+        if (action == 'modal_delete') {
+            delete_(form);
+        }else{
+            $.ajax({
+                type: "POST",
+                url: "<?php echo site_url('Setting_parameter/fasilitator_c/validate');?>", 
+                data: form,
+                dataType: "json",  
+                success: function(data){
+                    if (data.action == 'ok') {
+                        if (action == 'modal_edit') {
+                            edit(form);
+                        }else if(action == 'modal_add'){
+                            save(form);
                         }else{
-                            $('#input-' + key).addClass('is-invalid');
-                            $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            delete_(form);
                         }
-                    });
+                    }else{
+                        $.each(data, function(key, value) {
+                            if(value == ''){
+                                $('#input-' + key).removeClass('is-invalid');
+                                $('#input-' + key).addClass('is-valid');
+                                $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            }else{
+                                $('#input-' + key).addClass('is-invalid');
+                                $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            }
+                        });
+                    }
+                    
                 }
-                
-            }
-        });
+            });
+        }
         
     }
 

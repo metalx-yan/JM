@@ -9,6 +9,7 @@ class nama_program_c extends CI_Controller {
         $this->load->model('training_parameter');
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
+        access_login();
     }
 
     public function index(){
@@ -109,8 +110,8 @@ class nama_program_c extends CI_Controller {
     function validate(){
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
-            if ($key == 'kode_program') {
-                $require = 'required|trim|numeric';
+            if ($key == 'kode_program' || $key == 'keterangan_program') {
+                $require = '';
             }else{
                 $require = 'required|trim';
             }
@@ -136,8 +137,8 @@ class nama_program_c extends CI_Controller {
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
             if ($key == $key) {
-                if ($key == 'kode_program') {
-                    $require = 'required|trim|numeric';
+                if ($key == 'kode_program' || $key == 'keterangan_program') {
+                    $require = '';
                 }else{
                     $require = 'required|trim';
                 }

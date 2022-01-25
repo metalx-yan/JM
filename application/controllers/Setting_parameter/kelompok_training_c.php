@@ -9,6 +9,7 @@ class kelompok_training_c extends CI_Controller {
         $this->load->model('training_parameter');
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
+        access_login();
     }
 
     public function index(){
@@ -110,7 +111,7 @@ class kelompok_training_c extends CI_Controller {
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
             if ($key == 'kode_kelompok') {
-                $require = 'required|trim|numeric';
+                $require = '';
             }else{
                 $require = 'required|trim';
             }
@@ -137,7 +138,7 @@ class kelompok_training_c extends CI_Controller {
         foreach($_POST as $key => $val){
             if ($key == $key) {
                 if ($key == 'kode_kelompok') {
-                    $require = 'required|trim|numeric';
+                    $require = '';
                 }else{
                     $require = 'required|trim';
                 }

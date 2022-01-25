@@ -110,7 +110,7 @@ class jenis_pelatihan_c extends CI_Controller {
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
             if ($key == 'kode_pelatihan' || $key == 'sandi_LKPBU' || $key == 'sandi_OJK') {
-                $require = 'required|trim|numeric';
+                $require = 'numeric';
             }else{
                 $require = 'required|trim';
             }
@@ -137,7 +137,7 @@ class jenis_pelatihan_c extends CI_Controller {
         foreach($_POST as $key => $val){
             if ($key == $key) {
                 if ($key == 'kode_pelatihan' || $key == 'sandi_LKPBU' || $key == 'sandi_OJK') {
-                    $require = 'required|trim|numeric';
+                    $require = 'numeric';
                 }else{
                     $require = 'required|trim';
                 }

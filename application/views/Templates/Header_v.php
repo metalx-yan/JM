@@ -17,7 +17,7 @@
     <!-- <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script> -->
     <script src="<?= base_url('Assets/DataTables/datatables.min.js')?>"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <script src="<?= base_url('Assets/jQuery-Mask-Plugin-master/dist/jquery.mask.min.js');?>"></script>
 
     <style>
 .customcheck {

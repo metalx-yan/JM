@@ -9,14 +9,14 @@
       <div class="modal-body">
             
         <div class="mb-3 row">
-            <label class="col-sm-5 col-form-label">Kode Kelompok</label>
+            <!-- <label class="col-sm-5 col-form-label">Kode Kelompok</label> -->
             <div class="col-sm-7 form-group">
-            <input type="text" id="input-kode_kelompok" onkeyup="key(this)" value="<?php echo (( $kode_kelompok)? $kode_kelompok->kode_kelompok : '' ) ?>" name="kode_kelompok" class="form-control" required <?php echo (( $id == 'modal_edit' || $id == 'modal_delete')? 'readonly' : '' ) ?> >
+            <input type="hidden" id="input-kode_kelompok" onkeyup="key(this)" value="<?php echo (( $kode_kelompok)? $kode_kelompok->kode_kelompok : '' ) ?>" name="kode_kelompok" class="form-control" required <?php echo (( $id == 'modal_edit' || $id == 'modal_delete')? 'readonly' : '' ) ?> >
             <div id="error"></div>
             </div>
         </div>
         <div class="mb-3 row">
-            <label class="col-sm-5 col-form-label">Nama Fasilitator</label>
+            <label class="col-sm-5 col-form-label">Keterangan Kelompok</label>
             <div class="col-sm-7 form-group">
             <input type="text" id="input-keterangan_kelompok" onkeyup="key(this)" value="<?php echo (( $kode_kelompok)? $kode_kelompok->keterangan_kelompok : '' ) ?>" name="keterangan_kelompok" class="form-control" required <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?> >
             <div id="error"></div>

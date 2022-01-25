@@ -17,8 +17,8 @@
                 <table id="manage_menu" class="table table-bordered table-striped text-center align-middle" width="100%">
                     <thead>
                         <tr class="text-center">
-                            <!-- <th scope="row">No</th> -->
-                            <th>Kode Budget</th>
+                            <th scope="row">No</th>
+                            <!-- <th>Kode Budget</th> -->
                             <th>Keterangan Budget</th>
                             <th>Jenis Budget</th>
                             <th>Nominal</th>
@@ -45,6 +45,8 @@
 
 <script>
     $(document).ready(function() {
+        // $('.digitRupiah').mask('#.##0', {reverse: true});
+        
          default_dt();
         function default_dt() {
             $('#manage_menu').DataTable({
@@ -61,10 +63,19 @@
                 "deferRender": true,
                 "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
                 "columns": [
-                    { "data": "kode_budget" },
+                    {"data": 'kode_budget',"sortable": false, // !!! id_sort
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }  
+                    },
                     { "data": "keterangan_budget" },
                     { "data": "jenis_budget" },
-                    { "data": "nominal" },
+                    {"data": null,
+                        render: function (data, type, row, meta) {
+                            return new Intl.NumberFormat().format(data.nominal);
+                        }  
+                    },
+                    // { "data": "nominal" },
                     {data: null,
                         render: function (data, type, row, meta) {
                             return '<button class="btn btn-success m-3" onclick="edit_modal()" value="'+data.kode_budget+'">Edit</button> <button class="btn btn-danger" onclick="delete_modal()"  value="'+data.kode_budget+'">Delete</button>';
@@ -141,35 +152,39 @@
         $('#error').html(" ");
         form = $("#task").serialize();
 
-        $.ajax({
-            type: "POST",
-            url: "<?php echo site_url('Setting_parameter/item_budget_c/validate');?>", 
-            data: form,
-            dataType: "json",  
-            success: function(data){
-                if (data.action == 'ok') {
-                    if (action == 'modal_edit') {
-                        edit(form);
-                    }else if(action == 'modal_add'){
-                        save(form);
-                    }else{
-                        delete_(form);
-                    }
-                }else{
-                    $.each(data, function(key, value) {
-                        if(value == ''){
-                            $('#input-' + key).removeClass('is-invalid');
-                            $('#input-' + key).addClass('is-valid');
-                            $('#input-' + key).parents('.form-group').find('#error').html(value);
+        if (action == 'modal_delete') {
+            delete_(form);
+        }else{
+            $.ajax({
+                type: "POST",
+                url: "<?php echo site_url('Setting_parameter/item_budget_c/validate');?>", 
+                data: form,
+                dataType: "json",  
+                success: function(data){
+                    if (data.action == 'ok') {
+                        if (action == 'modal_edit') {
+                            edit(form);
+                        }else if(action == 'modal_add'){
+                            save(form);
                         }else{
-                            $('#input-' + key).addClass('is-invalid');
-                            $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            delete_(form);
                         }
-                    });
+                    }else{
+                        $.each(data, function(key, value) {
+                            if(value == ''){
+                                $('#input-' + key).removeClass('is-invalid');
+                                $('#input-' + key).addClass('is-valid');
+                                $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            }else{
+                                $('#input-' + key).addClass('is-invalid');
+                                $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            }
+                        });
+                    }
+                    
                 }
-                
-            }
-        });
+            });
+        }
         
     }
 
@@ -290,6 +305,7 @@
 
 
     function key(tes){
+        $('.digitRupiah').mask('#.##0', {reverse: true});
         names = $(tes).attr('name');
         term = $("input[type=text][name="+names+"]").val();
         val = {};

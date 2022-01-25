@@ -54,7 +54,13 @@ class item_budget_c extends CI_Controller {
         $table = 'item_budget';
         $field = 'kode_budget';
         foreach($_POST as $key => $val){
-            $data[$key] = $val;
+            if($key == 'nominal'){
+                $replace = str_replace('.','',$val);
+                $nominal = (int)$replace;
+                $data[$key] = $nominal;
+            }else{
+                $data[$key] = $val;
+            }
         }
         
         // cek kode 
@@ -77,7 +83,13 @@ class item_budget_c extends CI_Controller {
         $table = 'item_budget';
         $field = 'kode_budget';
         foreach($_POST as $key => $val){
-            $data[$key] = $val;
+            if($key == 'nominal'){
+                $replace = str_replace('.','',$val);
+                $nominal = (int)$replace;
+                $data[$key] = $nominal;
+            }else{
+                $data[$key] = $val;
+            }
         }
         // Update
         $Update = $this->training_parameter->update($data[$field],$data,$table,$field);
@@ -109,9 +121,12 @@ class item_budget_c extends CI_Controller {
     function validate(){
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
-            if ($key == 'kode_budget' || $key == 'nominal') {
-                $require = 'required|trim|numeric';
-            }else{
+            if ( $key == 'nominal') {
+                $require = 'required|trim';
+            }elseif ($key == 'kode_budget') {
+                $require = '';
+            }
+            else{
                 $require = 'required|trim';
             }
             $this->form_validation->set_rules($key,$key,$require);
@@ -136,9 +151,12 @@ class item_budget_c extends CI_Controller {
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
             if ($key == $key) {
-                if ($key == 'kode_budget' || $key == 'nominal') {
-                    $require = 'required|trim|numeric';
-                }else{
+                if ( $key == 'nominal') {
+                    $require = 'required|trim';
+                }elseif ($key == 'kode_budget') {
+                    $require = '';
+                }
+                else{
                     $require = 'required|trim';
                 }
                 $this->form_validation->set_rules($key,$key,$require);

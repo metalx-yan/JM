@@ -17,8 +17,8 @@
                 <table id="manage_menu" class="table table-bordered table-striped text-center align-middle" width="100%">
                     <thead>
                         <tr class="text-center">
-                            <!-- <th scope="row">No</th> -->
-                            <th>Kode Cabang</th>
+                            <th scope="row">No</th>
+                            <!-- <th>Kode Cabang</th> -->
                             <th>Nama Cabang</th>
                             <th>Regional</th>
                             <th>Action</th>
@@ -60,7 +60,11 @@
                 "deferRender": true,
                 "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
                 "columns": [
-                    { "data": "kode_cabang" },
+                    {"data": 'kode_cabang',"sortable": false, // !!! id_sort
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }  
+                    },
                     { "data": "nama_cabang" },
                     { "data" : "regional" },
                     {data: null,
@@ -139,35 +143,39 @@
         $('#error').html(" ");
         form = $("#task").serialize();
 
-        $.ajax({
-            type: "POST",
-            url: "<?php echo site_url('Setting_parameter/cabang_c/validate');?>", 
-            data: form,
-            dataType: "json",  
-            success: function(data){
-                if (data.action == 'ok') {
-                    if (action == 'modal_edit') {
-                        edit(form);
-                    }else if(action == 'modal_add'){
-                        save(form);
-                    }else{
-                        delete_(form);
-                    }
-                }else{
-                    $.each(data, function(key, value) {
-                        if(value == ''){
-                            $('#input-' + key).removeClass('is-invalid');
-                            $('#input-' + key).addClass('is-valid');
-                            $('#input-' + key).parents('.form-group').find('#error').html(value);
+        if (action == 'modal_delete') {
+            delete_(form);
+        }else{
+            $.ajax({
+                type: "POST",
+                url: "<?php echo site_url('Setting_parameter/cabang_c/validate');?>", 
+                data: form,
+                dataType: "json",  
+                success: function(data){
+                    if (data.action == 'ok') {
+                        if (action == 'modal_edit') {
+                            edit(form);
+                        }else if(action == 'modal_add'){
+                            save(form);
                         }else{
-                            $('#input-' + key).addClass('is-invalid');
-                            $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            delete_(form);
                         }
-                    });
+                    }else{
+                        $.each(data, function(key, value) {
+                            if(value == ''){
+                                $('#input-' + key).removeClass('is-invalid');
+                                $('#input-' + key).addClass('is-valid');
+                                $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            }else{
+                                $('#input-' + key).addClass('is-invalid');
+                                $('#input-' + key).parents('.form-group').find('#error').html(value);
+                            }
+                        });
+                    }
+                    
                 }
-                
-            }
-        });
+            });
+        }
         
     }
 

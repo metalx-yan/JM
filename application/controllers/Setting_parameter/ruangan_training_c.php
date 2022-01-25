@@ -41,10 +41,11 @@ class ruangan_training_c extends CI_Controller {
         $table = 'ruangan_training';
         $field = 'kode_ruangan';
         $join = 'lokasi_training';
+        $on_join = 'kode_lokasi';
         $modal = $this->input->post('modal');
         $id = $this->input->post('id');
         $kode_ = $this->input->post('kode_ruangan');
-        $data['kode_ruangan'] = $this->training_parameter->join_($kode_,$table,$field,$join)->row();
+        $data['kode_ruangan'] = $this->training_parameter->join_($kode_,$table,$field,$join,$on_join)->row();
         $data['kode_lokasi'] = $this->training_parameter->get_($join)->result_array();
         $data['modal_title'] = $modal;
         $data['id'] = $id;

@@ -96,8 +96,8 @@ class training_parameter extends CI_Model {
         return $this->db_training->get($table);
     }
 
-    function join_($kode,$table,$field,$join){
-        $this->db_training->join($join,"$join.kode_lokasi = $table.kode_lokasi",'left');
+    function join_($kode,$table,$field,$join,$on_join){
+        $this->db_training->join($join,"$join.$on_join = $table.$on_join",'left');
         $this->db_training->where($table.'.'.$field,$kode);
         return $this->db_training->get($table);
     }

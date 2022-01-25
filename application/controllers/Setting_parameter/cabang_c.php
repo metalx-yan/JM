@@ -110,7 +110,7 @@ class cabang_c extends CI_Controller {
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
             if ($key == 'kode_cabang') {
-                $require = 'required|trim|numeric';
+                $require = '';
             }else{
                 $require = 'required|trim';
             }
@@ -137,7 +137,7 @@ class cabang_c extends CI_Controller {
         foreach($_POST as $key => $val){
             if ($key == $key) {
                 if ($key == 'kode_cabang') {
-                    $require = 'required|trim|numeric';
+                    $require = '';
                 }else{
                     $require = 'required|trim';
                 }

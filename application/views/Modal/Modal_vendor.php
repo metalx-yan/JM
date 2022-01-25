@@ -46,7 +46,12 @@
         <div class="mb-3 row">
             <label class="col-sm-5 col-form-label">Tipe</label>
             <div class="col-sm-7 form-group">
-            <input type="text" id="input-tipe" onkeyup="key(this)" value="<?php echo (( $kode_vendor)? $kode_vendor->tipe : '' ) ?>" name="tipe" class="form-control" required <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?> >
+            <!-- <input type="text" id="input-tipe" onkeyup="key(this)" value="<?php echo (( $kode_vendor)? $kode_vendor->tipe : '' ) ?>" name="tipe" class="form-control" required <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?> > -->
+              <select  name="tipe" id="input-tipe" class="form-select" aria-label="Default select example" required <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?>>
+                <option value="<?php echo (( $kode_vendor)? $kode_vendor->tipe : '' ) ?>" selected><?php echo (( $kode_vendor)? $kode_vendor->tipe : '' ) ?></option>
+                <option value="Internal">Internal</option>
+                <option value="External">External</option>
+              </select>
             <div id="error"></div>
             </div>
         </div>
