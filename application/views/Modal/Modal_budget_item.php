@@ -32,7 +32,7 @@
         <div class="mb-3 row">
             <label class="col-sm-5 col-form-label">Nominal</label>
             <div class="col-sm-7 form-group">
-            <input type="text" id="input-nominal" onkeyup="key(this)" value="<?php echo (( $kode_budget)? $kode_budget->nominal : '' ) ?>" name="nominal" class="form-control digitRupiah" required <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?> >
+            <input type="text" id="input-nominal" onkeyup="key(this)" value="<?php echo (( $kode_budget)? number_format($kode_budget->nominal) : '' ) ?>" name="nominal" class="form-control digitRupiah" required <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?> >
             <div id="error"></div>
             </div>
         </div>

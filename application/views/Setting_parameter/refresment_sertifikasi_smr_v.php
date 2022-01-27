@@ -1,5 +1,5 @@
-<section class="nama_program">
-    <div class="row w-100">
+<section class="refresment_sertifikasi_smr">
+    <div class="row">
         <div class="col-md-12">
             <div class=" ms-5 me-5">
 
@@ -18,10 +18,9 @@
                     <thead>
                         <tr class="text-center">
                             <th scope="row">No</th>
-                            <!-- <th>Kode Program</th> -->
-                            <th>Nama Program</th>
-                            <th>Jenis Program</th>
-                            <th>Keterangan Program</th>
+                            <!-- <th>Kode REFRESMENT SERTIFKASI SMR</th> -->
+                            <th>Level Sertifikasi SMR</th>
+                            <th>MasaTenggang Sertifikasi</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -55,23 +54,22 @@
                 "order": [[ 0, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
                 "ajax":
                 {
-                    "url": "<?= base_url('Setting_parameter/nama_program_c/get/');?>", // URL file untuk proses select datanya
+                    "url": "<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/get/');?>", // URL file untuk proses select datanya
                     "type": "POST"
                 },
                 "deferRender": true,
                 "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
                 "columns": [
-                    {"data": 'kode_program',"sortable": false, // !!! id_sort
+                    {"data": 'level_sertifikasi_smr',"sortable": false, // !!! id_sort
                         render: function (data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }  
                     },
-                    { "data": "nama_program" },
-                    { "data": "jenis_program" },
-                    { "data": "keterangan_program" },
+                    { "data": "level_sertifikasi_smr" },
+                    { "data" : "masa_tenggang_sertifikasi" },
                     {data: null,
                         render: function (data, type, row, meta) {
-                            return '<button class="btn btn-success m-3" onclick="edit_modal()" value="'+data.kode_program+'">Edit</button> <button class="btn btn-danger" onclick="delete_modal()"  value="'+data.kode_program+'">Delete</button>';
+                            return '<button class="btn btn-success m-3" onclick="edit_modal()" value="'+data.level_sertifikasi_smr+'">Edit</button> <button class="btn btn-danger" onclick="delete_modal()"  value="'+data.level_sertifikasi_smr+'">Delete</button>';
                         }
                     } 
                 ],
@@ -82,10 +80,10 @@
 
     $("#add").on('click',()=>{
         var val = {};
-        val.modal = 'MODAL ADD NAMA PROGRAM';
+        val.modal = 'MODAL ADD REFRESMENT SERTIFKASI SMR';
         val.id = 'modal_add';
         $.ajax({    
-            url:'<?= base_url('Setting_parameter/nama_program_c/modal')?>',
+            url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/modal')?>',
             type:"post",
             data: val,
             success: function (res){
@@ -101,12 +99,12 @@
 
     function edit_modal(){
         var val = {};
-        val.modal = 'MODAL EDIT NAMA PROGRAM';
+        val.modal = 'MODAL EDIT REFRESMENT SERTIFKASI SMR';
         val.id = 'modal_edit';
-        val.kode_program = event.target.value;
+        val.level_sertifikasi_smr = event.target.value;
 
         $.ajax({
-            url:'<?= base_url('Setting_parameter/nama_program_c/modal/')?>',
+            url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/modal/')?>',
             type:"post",
             data: val,
             success: function (res){
@@ -122,12 +120,12 @@
 
     function delete_modal(){
         var val = {};
-        val.modal = 'MODAL DELETE NAMA PROGRAM';
+        val.modal = 'MODAL DELETE REFRESMENT SERTIFKASI SMR';
         val.id = 'modal_delete';
-        val.kode_program = event.target.value;
+        val.level_sertifikasi_smr = event.target.value;
 
         $.ajax({
-            url:'<?= base_url('Setting_parameter/nama_program_c/modal/')?>',
+            url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/modal/')?>',
             type:"post",
             data: val,
             success: function (res){
@@ -150,7 +148,7 @@
         }else{
             $.ajax({
                 type: "POST",
-                url: "<?php echo site_url('Setting_parameter/nama_program_c/validate');?>", 
+                url: "<?php echo site_url('Setting_parameter/refresment_sertifikasi_smr_c/validate');?>", 
                 data: form,
                 dataType: "json",  
                 success: function(data){
@@ -159,6 +157,8 @@
                             edit(form);
                         }else if(action == 'modal_add'){
                             save(form);
+                        }else{
+                            delete_(form);
                         }
                     }else{
                         $.each(data, function(key, value) {
@@ -190,7 +190,7 @@
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
                 $.ajax({
-                    url:'<?= base_url('Setting_parameter/nama_program_c/edit_/')?>',
+                    url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/edit_/')?>',
                     type:"post",
                     data: form,
                     success: function (res){
@@ -228,7 +228,7 @@
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
                 $.ajax({
-                    url:'<?= base_url('Setting_parameter/nama_program_c/save_/')?>',
+                    url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/save_/')?>',
                     type:"post",
                     data: form,
                     success: function (res){
@@ -267,7 +267,7 @@
             }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url:'<?= base_url('Setting_parameter/nama_program_c/delete_/')?>',
+                    url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/delete_/')?>',
                     type:"post",
                     data: form,
                     success: function (res){
@@ -303,7 +303,7 @@
 
         $.ajax({
             type: "POST",
-            url: "<?php echo site_url('Setting_parameter/nama_program_c/validate_keyup/');?>", 
+            url: "<?php echo site_url('Setting_parameter/refresment_sertifikasi_smr_c/validate_keyup/');?>", 
             data: val,
             dataType: "json",  
             success: function(data){

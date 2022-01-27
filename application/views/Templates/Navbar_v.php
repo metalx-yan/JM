@@ -23,7 +23,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <?= $navbar_parent['menu_name']?>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
+                                <ul class="animate-menu slideIn-menu dropdown-menu dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
                                     <?php foreach($navbar_child as $child){?>
                                         <?php if($child['parent'] == $navbar_parent['id_menu']):?>
                                             <li><a class="dropdown-item" href="<?= base_url($child['file'])?>"><?= $child['menu_name']?></a></li>

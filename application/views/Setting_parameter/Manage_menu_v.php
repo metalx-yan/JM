@@ -1,5 +1,5 @@
-<section class="level_user">
-    <div class="row">
+<section class="manage_menu">
+    <div class="row w-100">
         <div class="col-md-12">
             <div class=" ms-5 me-5">
                 <div class="card-header bg-warning mb-3">

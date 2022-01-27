@@ -13,11 +13,17 @@
     <script src="<?= base_url('Assets/sweetalert2/dist/sweetalert2.min.js')?>"></script>
     <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css"> -->
     <link rel="stylesheet" href="<?= base_url('Assets/DataTables/datatables.min.css')?>">
+
+    <link rel="stylesheet" href="<?= base_url('Assets/css/smooth-menu-parent.css')?>">
+
+
     <script src="<?= base_url('Assets/jquery/dist/jquery.min.js')?>"></script>
     <!-- <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script> -->
     <script src="<?= base_url('Assets/DataTables/datatables.min.js')?>"></script>
 
     <script src="<?= base_url('Assets/jQuery-Mask-Plugin-master/dist/jquery.mask.min.js');?>"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 
     <style>
 .customcheck {

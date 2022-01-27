@@ -121,7 +121,7 @@ class vendor_c extends CI_Controller {
 
         if (!$this->form_validation->run()) {
             foreach($_POST as $key => $val){
-                $json[$key] = form_error($key, '<p class="mt-3 text-danger">', '</p>');
+                $json[$key] = form_error($key, '<span class="mt-3 text-danger">', '</span>');
             }
         }else{
             $json = array(
@@ -156,7 +156,7 @@ class vendor_c extends CI_Controller {
         if (!$this->form_validation->run()) {
             foreach($_POST as $key => $val){
                 if ($key == $key) {
-                    $json[$key] = form_error($key, '<p class="mt-3 text-danger">', '</p>');
+                    $json[$key] = form_error($key, '<span class="mt-3 text-danger">', '</span>');
                 }
             }
         }else{

@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class uang_saku_c extends CI_Controller {
+class penginapan_c extends CI_Controller {
     public function __construct(){
         parent:: __construct();
         $this->load->model('User_model');
@@ -12,7 +12,7 @@ class uang_saku_c extends CI_Controller {
     }
 
     public function index(){
-        $data['title_head'] = 'UANG SAKU ';
+        $data['title_head'] = 'PENGINAPAN atau HOTEL';
         $jabatan = $_SESSION['jabatan'];
         $data['navbar_parent'] = $this->User_model->get_navbar_name($jabatan,'Parent')->result_array();
         $data['navbar_child'] = $this->User_model->get_child_name($jabatan,'Child')->result_array();
@@ -20,13 +20,13 @@ class uang_saku_c extends CI_Controller {
 
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
-        $this->load->view('Setting_parameter/uang_saku_v',$data);
+        $this->load->view('Setting_parameter/penginapan_v',$data);
         $this->load->view('Templates/Footer_v');
     } 
 
     public function get(){
-        $query = 	"SELECT * FROM uang_saku";
-        $search = array('kode_uang_saku', 'kode_pangkat', 'keterangan_peserta', 'dalam_luar_negeri', 'tujuan_negara', 'uang_makan', 'nilai_nominal', 'mata_uang');
+        $query = 	"SELECT * FROM penginapan";
+        $search = array('kode_penginapan', 'kode_pangkat', 'sharing_kamar','kelas_penginapan', 'nilai_nominal');
         $where  = null; 
         // $where  = array('nama_kategori' => 'Tutorial');
         // jika memakai IS NULL pada where sql
@@ -38,29 +38,29 @@ class uang_saku_c extends CI_Controller {
     }
 
     public function modal(){
-        $table = 'uang_saku';
-        $field = 'kode_uang_saku';
+        $table = 'penginapan';
+        $field = 'kode_penginapan';
         $modal = $this->input->post('modal');
         $id = $this->input->post('id');
-        $kode_ = $this->input->post('kode_uang_saku');
-        $data['kode_uang_saku'] = $this->training_parameter->where($kode_,$table,$field)->row();
+        $kode_ = $this->input->post('kode_penginapan');
+        $data['kode_penginapan'] = $this->training_parameter->where($kode_,$table,$field)->row();
         $data['modal_title'] = $modal;
         $data['id'] = $id;
-        $html_modal = $this->load->view('Modal/Modal_uang_saku',$data,TRUE);
+        $html_modal = $this->load->view('Modal/Modal_penginapan',$data,TRUE);
         echo $html_modal;
     }
 
     function save_(){
-        $table = 'uang_saku';
-        $field = 'kode_uang_saku';
+        $table = 'penginapan';
+        $field = 'kode_penginapan';
         foreach($_POST as $key => $val){
-            if($key == 'nilai_nominal'){
-                $replace = str_replace(',','',$val);
-                $nominal = (int)$replace;
-                $data[$key] = $nominal;
-            }else{
-                $data[$key] = $val;
-            }
+          if($key == 'nilai_nominal'){
+            $replace = str_replace(',','',$val);
+            $nominal = (int)$replace;
+            $data[$key] = $nominal;
+          }else{
+              $data[$key] = $val;
+          }
         }
         
         // cek kode 
@@ -80,17 +80,17 @@ class uang_saku_c extends CI_Controller {
     }
 
     function edit_(){
-        $table = 'uang_saku';
-        $field = 'kode_uang_saku';
+        $table = 'penginapan';
+        $field = 'kode_penginapan';
         
         foreach($_POST as $key => $val){
-            if($key == 'nilai_nominal'){
-                $replace = str_replace(',','',$val);
-                $nominal = (int)$replace;
-                $data[$key] = $nominal;
-            }else{
-                $data[$key] = $val;
-            }
+          if($key == 'nilai_nominal'){
+              $replace = str_replace(',','',$val);
+              $nominal = (int)$replace;
+              $data[$key] = $nominal;
+          }else{
+              $data[$key] = $val;
+          }
         }
         // Update
         $Update = $this->training_parameter->update($data[$field],$data,$table,$field);
@@ -103,8 +103,8 @@ class uang_saku_c extends CI_Controller {
     }
 
     function delete_(){
-        $table = 'uang_saku';
-        $field = 'kode_uang_saku';
+        $table = 'penginapan';
+        $field = 'kode_penginapan';
         foreach($_POST as $key => $val){
             $data[$key] = $val;
         }
@@ -124,7 +124,7 @@ class uang_saku_c extends CI_Controller {
         foreach($_POST as $key => $val){
             if ($key == 'kode_pangkat') {
                 $require = 'required|trim|numeric';
-            }elseif ($key == 'kode_uang_saku' || $key == 'tujuan_negara' || $key == 'uang_makan') {
+            }elseif ($key == 'kode_penginapan' || $key == 'nilai_nominal') {
                 $require = '';
             }
             else{
@@ -152,14 +152,14 @@ class uang_saku_c extends CI_Controller {
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
             if ($key == $key) {
-                if ($key == 'kode_pangkat') {
-                    $require = 'required|trim|numeric';
-                }elseif ($key == 'kode_uang_saku' || $key == 'tujuan_negara' || $key == 'uang_makan') {
-                    $require = '';
-                }
-                else{
-                    $require = 'required|trim';
-                }
+              if ($key == 'kode_pangkat') {
+                $require = 'required|trim|numeric';
+              }elseif ($key == 'kode_penginapan' || $key == 'nilai_nominal') {
+                  $require = '';
+              }
+              else{
+                  $require = 'required|trim';
+              }
                 $this->form_validation->set_rules($key,$key,$require);
             }
         }
