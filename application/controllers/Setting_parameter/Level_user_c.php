@@ -27,10 +27,8 @@ class Level_user_c extends CI_Controller {
             }
         }
 
-        // var_dump($data['level_detail4']);die;
-
-        $data['navbar_parent'] = $this->User_model->get_navbar_name($jabatan,'Parent')->result_array();
-        $data['navbar_child'] = $this->User_model->get_child_name($jabatan,'Child')->result_array();
+        $data['navbar_parent'] = navbar_perent($jabatan);
+        $data['navbar_child'] = navbar_child($jabatan);
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
         $this->load->view('Setting_parameter/Level_user_v',$data);
@@ -38,19 +36,6 @@ class Level_user_c extends CI_Controller {
     }
 
     public function update_level_user(){
-
-        // $last = $this->uri->total_segments();
-        // $record_num = '';
-        // for ($i= 1; $i <= $last ; $i++) { 
-        //     $record_num .= $this->uri->segment($i)."/";
-        // }
-
-        // $last_segment = array_slice(explode('/', $record_num),-2,1);
-        // $check_uri = array_slice(explode('_',$last_segment[0]),0,1);
-        // if ($check_uri[0] == 'update' || $check_uri[0] == 'delete' || $check_uri[0] == 'add') {
-        //     # code...
-        // }
-        // var_dump($check_uri[0]);die;
 
         $tampil = $this->input->post('tampil');
         $addm = $this->input->post('addm');

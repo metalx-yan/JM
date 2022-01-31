@@ -85,12 +85,11 @@ class User_model extends CI_Model {
     //    
     }
 
-
-
     public function get_level_detail(){
         // $this->db->select('*');
         // $this->db->where('id_level',$id_level);
         // $this->db->where('id_menu',$id_menu);
         return $this->db->get('level_detail');
     }
+
 }

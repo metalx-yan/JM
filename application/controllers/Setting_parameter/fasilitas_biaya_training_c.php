@@ -9,13 +9,14 @@ class fasilitas_biaya_training_c extends CI_Controller {
         $this->load->model('training_parameter');
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
+        access_login();
     }
 
     public function index(){
         $data['title_head'] = 'FASILITAS BIAYA TRAINING';
         $jabatan = $_SESSION['jabatan'];
-        $data['navbar_parent'] = $this->User_model->get_navbar_name($jabatan,'Parent')->result_array();
-        $data['navbar_child'] = $this->User_model->get_child_name($jabatan,'Child')->result_array();
+        $data['navbar_parent'] = navbar_perent($jabatan);
+        $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
 
         $this->load->view('Templates/Header_v',$data);
@@ -25,8 +26,8 @@ class fasilitas_biaya_training_c extends CI_Controller {
     } 
 
     public function get(){
-        $query = 	"SELECT * FROM fasilitas_biaya_training JOIN lokasi_training on fasilitas_biaya_training.kode_lokasi = lokasi_training.kode_lokasi";
-        $search = array('kode_fasilitas', 'nama_tempat', 'fasilitas_biaya_training.kode_lokasi','kode_cabang_peserta');
+        $query = 	"SELECT * FROM fasilitas_biaya_training JOIN lokasi_training on fasilitas_biaya_training.kode_lokasi = lokasi_training.kode_lokasi JOIN cabang on cabang.kode_cabang = fasilitas_biaya_training.kode_cabang";
+        $search = array('kode_fasilitas', 'nama_tempat', 'fasilitas_biaya_training.kode_lokasi','fasilitas_biaya_training.kode_cabang');
         $where  = null; 
         // $where  = array('nama_kategori' => 'Tutorial');
         // jika memakai IS NULL pada where sql
@@ -42,11 +43,14 @@ class fasilitas_biaya_training_c extends CI_Controller {
         $field = 'kode_fasilitas';
         $join = 'lokasi_training';
         $on_join = 'kode_lokasi';
+        $join2 = 'cabang';
+        $on_join2 = 'kode_cabang';
         $modal = $this->input->post('modal');
         $id = $this->input->post('id');
         $kode_ = $this->input->post('kode_fasilitas');
-        $data['kode_fasilitas'] = $this->training_parameter->join_($kode_,$table,$field,$join,$on_join)->row();
+        $data['kode_fasilitas'] = $this->training_parameter->join_2($kode_,$table,$field,$join,$on_join,$join2,$on_join2)->row();
         $data['kode_lokasi'] = $this->training_parameter->get_($join)->result_array();
+        $data['kode_cabang'] = $this->training_parameter->get_($join2)->result_array();
         $data['modal_title'] = $modal;
         $data['id'] = $id;
         $html_modal = $this->load->view('Modal/Modal_v',$data,TRUE);

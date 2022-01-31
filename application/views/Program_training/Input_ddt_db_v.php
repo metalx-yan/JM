@@ -437,7 +437,7 @@
             <div class="row mb-5 mt-4">
                 <div class="col-md-12 text-center">
                     <button class="btn btn-warning me-4">Kirim</button>
-                    <button class="btn btn-warning">Batal</button>
+                    <a href="<?= base_url('Program_training/Proses_pengajuan_training_c')?>"><button class="btn btn-warning">Batal</button></a>
                 </div>
             </div>
 
@@ -534,6 +534,8 @@
 </section>
 
 <script>
+   
+
     function views(){
         var val = {};
         val.modal = 'modal';

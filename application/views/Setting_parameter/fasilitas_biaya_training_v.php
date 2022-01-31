@@ -43,7 +43,9 @@
 
 <script>
     $(document).ready(function() {
-         default_dt();
+        default_dt();
+        
+
         function default_dt() {
             $('#manage_menu').DataTable({
                 "processing": true,
@@ -65,7 +67,7 @@
                         }  
                     },
                     { "data": "nama_tempat" },
-                    { "data": "kode_cabang_peserta" },
+                    { "data": "kode_cabang" },
                     {data: null,
                         render: function (data, type, row, meta) {
                             return '<button class="btn btn-success m-3" onclick="edit_modal()" value="'+data.kode_fasilitas+'">Edit</button> <button class="btn btn-danger" onclick="delete_modal()"  value="'+data.kode_fasilitas+'">Delete</button>';
@@ -75,7 +77,12 @@
             });
         }
 
+        function access(){
+
+        }
+
     });
+
 
     $("#add").on('click',()=>{
         var val = {};

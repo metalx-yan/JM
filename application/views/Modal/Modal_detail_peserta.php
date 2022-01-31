@@ -20,10 +20,10 @@
                 <div class="row mb-3">
                     <div class="col-sm-3"></div>
                     <div class="col-sm-4 ms-4">
-                        <input class="form-check-input" type="radio" name="country" id="btn_country1">Dalam Negeri
+                        <input class="form-check-input" type="radio" name="country" id="btn_country1" required>Dalam Negeri
                     </div>
                     <div class="col-sm-4">
-                        <input class="form-check-input" type="radio" name="country" id="btn_country2">Luar Negeri
+                        <input class="form-check-input" type="radio" name="country" id="btn_country2" required>Luar Negeri
                     </div>
                 </div>
 
@@ -96,24 +96,24 @@
                             <td><?= $row->pangkat; ?></td>
                             <td><?= count($data_peserta)?></td>
                             <?php if ($training == 'OFFLINE') { ?>
-                                <td class="p-2"><input type="text" id="uang_saku<?= $row->nip_peserta;?>" value="120" name="uang_saku" disabled></td>
+                                <td class="p-2"><input type="number" onkeyup="hitung_jumlah(this)" id="uang_saku<?= $row->nip_peserta;?>" value="123" name="uang_saku[]" disabled></td>
                                 <td class="p-2">
                                     <label class="customcheck">
-                                        <input name="uang_saku_check<?= $row->nip_peserta;?>" value="<?= $row->nip_peserta;?>" id="uang_saku"  type="checkbox" checked=>
+                                        <input id="uang_saku_check<?= $row->nip_peserta;?>" value="<?= $row->nip_peserta;?>" name=""  type="checkbox" checked=>
                                         <span class="checkmark"></span>
                                     </label>
                                 </td>
-                                <td class="p-2"><input type="text" name="transportasi" value="210" id="transportasi<?= $row->nip_peserta;?>" disabled></td>
+                                <td class="p-2"><input type="number" onkeyup="hitung_jumlah(this)" name="transportasi[]" value="210" id="transportasi<?= $row->nip_peserta;?>" disabled></td>
                                 <td class="p-2">
                                     <label class="customcheck">
-                                        <input name="transportasi_check<?= $row->nip_peserta;?>" type="checkbox" id="" checked="checked">
+                                        <input id="transportasi_check<?= $row->nip_peserta;?>" type="checkbox" name="" checked="checked">
                                         <span class="checkmark"></span>
                                     </label>
                                 </td>
-                                <td class="p-2"> <input type="text" name="penginapan" value="310" id="penginapan<?= $row->nip_peserta;?>" disabled></td>
+                                <td class="p-2"> <input type="number" onkeyup="hitung_jumlah(this)" name="penginapan[]" value="310" id="penginapan<?= $row->nip_peserta;?>" disabled></td>
                                 <td class="p-2">
                                     <label class="customcheck">
-                                        <input name="penginapan_check<?= $row->nip_peserta;?>" type="checkbox" checked="checked">
+                                        <input id="penginapan_check<?= $row->nip_peserta;?>" type="checkbox" name="" checked="checked">
                                         <span class="checkmark"></span>
                                     </label>
                                 </td>
@@ -125,12 +125,12 @@
                     <tfoot>
                         <tr>
                             <th class="text-end" colspan="7">Jumlah</th>
-                            <td class="bg-danger">xxxxxxxx</td>
-                            <td class="bg-danger"></td>
-                            <td class="bg-danger">xxxxxxxx</td>
-                            <td class="bg-danger"></td>
-                            <td class="bg-danger">xxxxxxxx</td>
-                            <td class="bg-danger"></td>
+                            <td><input id="total_uang_saku" class="border-0" type="text" name="total_uang_saku" readonly></td>
+                            <td></td>
+                            <td><input id="total_transportasi" class="border-0" type="text" name="total_transportasi" readonly></td>
+                            <td></td>
+                            <td><input id="total_penginapan" class="border-0" type="text" name="total_penginapan" readonly></td>
+                            <td></td>
                         </tr>
                     </tfoot>
                     <?php } ?>
@@ -140,13 +140,52 @@
       </div>
       <div class="modal-footer text-center">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-warning">Simpan</button>
+        <button type="button" id="simpan_uang_saku" class="btn btn-warning">Simpan</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+     $(document).ready(function() {
+        total_();
+
+        function total_(){
+            sum_uang_saku = 0;
+            sum_transportasi = 0;
+            sum_penginapan = 0;
+            <?php $no = 1; foreach ($data_peserta as $row) : ?>
+                uang_saku = $('#uang_saku<?= $row->nip_peserta;?>').val();
+                sum_uang_saku += parseInt(uang_saku);
+                transportasi = $('#transportasi<?= $row->nip_peserta;?>').val();
+                sum_transportasi += parseInt(transportasi);
+                penginapan = $('#penginapan<?= $row->nip_peserta;?>').val();
+                sum_penginapan += parseInt(penginapan);
+                
+            <?php endforeach; ?>
+            $('#total_uang_saku').val(sum_uang_saku);
+            $('#total_transportasi').val(sum_transportasi);
+            $('#total_penginapan').val(sum_penginapan);
+        }
+    });
+
+    function hitung_jumlah(nilai){
+        names = $(nilai).attr('name');
+        name = names.replace('[]','');
+        // term = $("input[type=number][name="+name+"]").val();
+        this['sum_'+name] = 0;
+        <?php $no = 1; foreach ($data_peserta as $row) : ?>
+            val_ = $('#'+name+'<?= $row->nip_peserta;?>').val();
+            this['sum_'+name] += parseInt(val_);
+            
+        <?php endforeach; ?>
+        $('#total_'+name).val(this['sum_'+name]);
+        // alert(this['sum_'+name]);
+
+    }
+
+
+
     $('#btn_country1').on("click",function() {
         $('#negara').attr('disabled','disabled');
         $('#biaya_makan').attr('disabled','disabled');
@@ -157,29 +196,41 @@
     });
 
     <?php $no = 1; foreach ($data_peserta as $row) : ?>
-    $('input[name="uang_saku_check<?= $row->nip_peserta;?>"]').click(()=>{
-        if($('input[name="uang_saku_check<?= $row->nip_peserta;?>"]').prop("checked") == true){
+    $('input[id="uang_saku_check<?= $row->nip_peserta;?>"]').click(()=>{
+        if($('input[id="uang_saku_check<?= $row->nip_peserta;?>"]').prop("checked") == true){
             $('#uang_saku<?= $row->nip_peserta;?>').attr('disabled', 'disabled');
         }else{
             $('#uang_saku<?= $row->nip_peserta;?>').removeAttr('disabled');
         }
     });
 
-    $('input[name="transportasi_check<?= $row->nip_peserta;?>"]').on("click",()=>{
-        if($('input[name="transportasi_check<?= $row->nip_peserta;?>"]').is(":checked")){
+    $('input[id="transportasi_check<?= $row->nip_peserta;?>"]').on("click",()=>{
+        if($('input[id="transportasi_check<?= $row->nip_peserta;?>"]').is(":checked")){
             $('#transportasi<?= $row->nip_peserta;?>').attr('disabled', 'disabled');
         }else{
             $('#transportasi<?= $row->nip_peserta;?>').removeAttr('disabled');
         }
     });
 
-    $('input[name="penginapan_check<?= $row->nip_peserta;?>"]').on("click",()=>{
-        if($('input[name="penginapan_check<?= $row->nip_peserta;?>"]').is(":checked")){
+    $('input[id="penginapan_check<?= $row->nip_peserta;?>"]').on("click",()=>{
+        if($('input[id="penginapan_check<?= $row->nip_peserta;?>"]').is(":checked")){
             $('#penginapan<?= $row->nip_peserta;?>').attr('disabled', 'disabled');
         }else{
             $('#penginapan<?= $row->nip_peserta;?>').removeAttr('disabled');
         }
     });
     <?php endforeach; ?>
+
+    // $('#total_uang_saku').on('keyup',()=>{
+    //     <?php $no = 1; foreach ($data_peserta as $row) : ?>
+    //         tes = $('#uang_saku<?= $row->nip_peserta;?>').value;
+    //         alert(tes);
+    //     <?php endforeach; ?>
+    // })
+
+
+    // $('#simpan_uang_saku').on('click',()=>{
+    //     alert('esteh');
+    // });
 
 </script>

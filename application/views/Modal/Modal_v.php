@@ -29,13 +29,27 @@
             <div id="error"></div>
             </div>
         </div>
+
         <div class="mb-3 row">
             <label class="col-sm-5 col-form-label">Kode Cabang Peserta</label>
             <div class="col-sm-7 form-group">
-            <input type="text" id="input-kode_cabang_peserta" onkeyup="key(this)" value="<?php echo (( $kode_fasilitas)? $kode_fasilitas->kode_cabang_peserta : '' ) ?>" name="kode_cabang_peserta" class="form-control" required <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?> >
+            <select name="kode_cabang" id="input-kode_cabang" class="form-select form-select-sm" aria-label=".form-select-sm example" <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?> required>
+              <option value="<?= (( $kode_fasilitas)? $kode_fasilitas->kode_cabang : '' )?>"  selected><?php echo (( $kode_fasilitas)? $kode_fasilitas->nama_cabang : '' ) ?></option>
+              <?php foreach($kode_cabang as $lokasi):?>
+                <option value="<?= $lokasi['kode_cabang']?>"><?= $lokasi['nama_cabang']; ?></option>
+              <?php endforeach; ?>
+            </select>
             <div id="error"></div>
             </div>
         </div>
+        
+        <!-- <div class="mb-3 row">
+            <label class="col-sm-5 col-form-label">Kode Cabang Peserta</label>
+            <div class="col-sm-7 form-group">
+            <input type="text" id="input-kode_cabang" onkeyup="key(this)" value="<?php echo (( $kode_fasilitas)? $kode_fasilitas->kode_cabang : '' ) ?>" name="kode_cabang" class="form-control" required <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?> >
+            <div id="error"></div>
+            </div>
+        </div> -->
       
             
       </div>

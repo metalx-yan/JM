@@ -6,13 +6,14 @@ class Manage_menu_c extends CI_Controller {
         parent:: __construct();
         $this->load->model('User_model');
         $this->load->model('M_Datatables');
+        access_login();
     }
 
     public function index(){
         $data['title_head'] = 'Manage Menu';
         $jabatan = $_SESSION['jabatan'];
-        $data['navbar_parent'] = $this->User_model->get_navbar_name($jabatan,'Parent')->result_array();
-        $data['navbar_child'] = $this->User_model->get_child_name($jabatan,'Child')->result_array();
+        $data['navbar_parent'] = navbar_perent($jabatan);
+        $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
 
         $this->load->view('Templates/Header_v',$data);

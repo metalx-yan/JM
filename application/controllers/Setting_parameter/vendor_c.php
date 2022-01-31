@@ -9,15 +9,16 @@ class vendor_c extends CI_Controller {
         $this->load->model('training_parameter');
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
+        access_login();
     }
 
     public function index(){
         $data['title_head'] = 'Vendor';
         $jabatan = $_SESSION['jabatan'];
-        $data['navbar_parent'] = $this->User_model->get_navbar_name($jabatan,'Parent')->result_array();
-        $data['navbar_child'] = $this->User_model->get_child_name($jabatan,'Child')->result_array();
+        $data['navbar_parent'] = navbar_perent($jabatan);
+        $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
-
+        // $this->My_access->My_access2();
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
         $this->load->view('Setting_parameter/vendor_v',$data);
