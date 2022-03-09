@@ -6,10 +6,10 @@
                 <div class="card-header bg-warning mb-3">
                     <div class="row">
                         <div class="col-6">
-                            <h6><?= $title_head?></h6>
+                            <h6><?= $title_head ?></h6>
                         </div>
                         <div class="col-6 text-end">
-                            <button class="btn btn-sm btn-primary" id="add">ADD</button>
+                            <?= $access_crud['access_add'] ?>
                         </div>
                     </div>
                 </div>
@@ -44,51 +44,76 @@
 
 <script>
     $(document).ready(function() {
-         default_dt();
+        default_dt();
+
         function default_dt() {
             $('#manage_menu').DataTable({
                 "processing": true,
-                "responsive":true,
+                "responsive": true,
                 "serverSide": true,
                 "ordering": true, // Set true agar bisa di sorting
-                "order": [[ 0, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
-                "ajax":
-                {
-                    "url": "<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/get/');?>", // URL file untuk proses select datanya
+                "order": [
+                    [0, 'asc']
+                ], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
+                "ajax": {
+                    "url": "<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/get/'); ?>", // URL file untuk proses select datanya
                     "type": "POST"
                 },
                 "deferRender": true,
-                "aLengthMenu": [[5, 10, 50],[ 5, 10, 50]], // Combobox Limit
-                "columns": [
-                    {"data": 'level_sertifikasi_smr',"sortable": false, // !!! id_sort
-                        render: function (data, type, row, meta) {
+                "aLengthMenu": [
+                    [5, 10, 50],
+                    [5, 10, 50]
+                ], // Combobox Limit
+                "columns": [{
+                        "data": 'level_sertifikasi_smr',
+                        "sortable": false, // !!! id_sort
+                        render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
-                        }  
-                    },
-                    { "data": "level_sertifikasi_smr" },
-                    { "data" : "masa_tenggang_sertifikasi" },
-                    {data: null,
-                        render: function (data, type, row, meta) {
-                            return '<button class="btn btn-success m-3" onclick="edit_modal()" value="'+data.level_sertifikasi_smr+'">Edit</button> <button class="btn btn-danger" onclick="delete_modal()"  value="'+data.level_sertifikasi_smr+'">Delete</button>';
                         }
-                    } 
+                    },
+                    {
+                        "data": "level_sertifikasi_smr"
+                    },
+                    {
+                        "data": "masa_tenggang_sertifikasi"
+                    },
+                    {
+                        data: null,
+                        "sortable": false,
+                        render: function(data, type, row, meta) {
+                            edits = ('<?= $access_crud['access_edit']['visible'] ?>' == '') ? '' : '<?= $access_crud['access_edit']['btn'] ?>'
+                            deletes = ('<?= $access_crud['access_delete']['visible'] ?>' == '') ? '' : '<?= $access_crud['access_delete']['btn'] ?>'
+                            return edits + deletes
+                        },
+                        "visible": ('<?= $access_crud['access_edit']['visible'] ?>' == '' && '<?= $access_crud['access_delete']['visible'] ?>' == '')? false:true
+                    }
                 ],
             });
         }
 
     });
 
-    $("#add").on('click',()=>{
+    
+    function close_modal(data_) {
+        action = $(data_).attr('data');
+        $("#" + action).remove();
+    }
+
+    $("#add").on('click', () => {
         var val = {};
         val.modal = 'MODAL ADD REFRESMENT SERTIFKASI SMR';
         val.id = 'modal_add';
-        $.ajax({    
-            url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/modal')?>',
-            type:"post",
+        $.ajax({
+            url: '<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/modal') ?>',
+            type: "post",
             data: val,
-            success: function (res){
+            success: function(res) {
                 // alert(res);
                 $(".modal_add").html(res);
+                $('#modal_add').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
                 $('#modal_add').modal('show');
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -97,19 +122,23 @@
         });
     });
 
-    function edit_modal(){
+    function edit_modal() {
         var val = {};
         val.modal = 'MODAL EDIT REFRESMENT SERTIFKASI SMR';
         val.id = 'modal_edit';
         val.level_sertifikasi_smr = event.target.value;
 
         $.ajax({
-            url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/modal/')?>',
-            type:"post",
+            url: '<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/modal/') ?>',
+            type: "post",
             data: val,
-            success: function (res){
+            success: function(res) {
                 // alert(res);
                 $(".modal_edit").html(res);
+                $('#modal_edit').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
                 $('#modal_edit').modal('show');
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -118,18 +147,22 @@
         });
     };
 
-    function delete_modal(){
+    function delete_modal() {
         var val = {};
         val.modal = 'MODAL DELETE REFRESMENT SERTIFKASI SMR';
         val.id = 'modal_delete';
         val.level_sertifikasi_smr = event.target.value;
 
         $.ajax({
-            url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/modal/')?>',
-            type:"post",
+            url: '<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/modal/') ?>',
+            type: "post",
             data: val,
-            success: function (res){
+            success: function(res) {
                 $(".modal_delete").html(res);
+                $('#modal_delete').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
                 $('#modal_delete').modal('show');
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -138,48 +171,88 @@
         });
     };
 
-    function action_submit(data_){
+    function action_submit(data_) {
         action = $(data_).attr('data');
         $('#error').html(" ");
-        form = $("#task").serialize();
+        form = $("#form_"+action).serialize();
 
         if (action == 'modal_delete') {
             delete_(form);
-        }else{
+        } else {
             $.ajax({
                 type: "POST",
-                url: "<?php echo site_url('Setting_parameter/refresment_sertifikasi_smr_c/validate');?>", 
+                url: "<?php echo site_url('Setting_parameter/refresment_sertifikasi_smr_c/validate'); ?>",
                 data: form,
-                dataType: "json",  
-                success: function(data){
+                dataType: "json",
+                success: function(data) {
                     if (data.action == 'ok') {
                         if (action == 'modal_edit') {
                             edit(form);
-                        }else if(action == 'modal_add'){
+                        } else if (action == 'modal_add') {
                             save(form);
-                        }else{
+                        } else {
                             delete_(form);
                         }
-                    }else{
+                    } else {
                         $.each(data, function(key, value) {
-                            if(value == ''){
+                            if (value == '') {
                                 $('#input-' + key).removeClass('is-invalid');
                                 $('#input-' + key).addClass('is-valid');
                                 $('#input-' + key).parents('.form-group').find('#error').html(value);
-                            }else{
+                            } else {
                                 $('#input-' + key).addClass('is-invalid');
                                 $('#input-' + key).parents('.form-group').find('#error').html(value);
                             }
                         });
                     }
-                    
+
                 }
             });
         }
-        
+
     }
 
-    function edit(form){
+    function edit(form) {
+        Swal.fire({
+            title: 'Do you want to save the changes?',
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: 'Save',
+            denyButtonText: `Cancel`,
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/edit_/') ?>',
+                    type: "post",
+                    data: form,
+                    success: function(res) {
+                        if (res == 'Berhasil Update') {
+                            Swal.fire({
+                                title: 'Your has been updated.',
+                                icon: 'success',
+                                timer: 2000
+                            });
+                            setTimeout(function() {
+                                location.reload(true);
+                            }, 1000);
+                        } else {
+                            alert(res);
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert('gagal');
+                    }
+                });
+
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
+            }
+        })
+
+    }
+
+    function save(form) {
         Swal.fire({
             title: 'Do you want to save the changes?',
             showDenyButton: true,
@@ -190,56 +263,20 @@
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
                 $.ajax({
-                    url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/edit_/')?>',
-                    type:"post",
+                    url: '<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/save_/') ?>',
+                    type: "post",
                     data: form,
-                    success: function (res){
-                        if(res == 'Berhasil Update'){
-                            Swal.fire({
-                                title: 'Your has been updated.',
-                                icon:'success',
-                                timer: 2000
-                            });
-                            location.reload(true);
-                        }else{
-                            alert(res);
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        alert('gagal');
-                    }
-                });
-                
-            } else if (result.isDenied) {
-                Swal.fire('Changes are not saved', '', 'info')
-            }
-        })
-        
-    }
-    
-    function save(form){
-        Swal.fire({
-            title: 'Do you want to save the changes?',
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: 'Save',
-            denyButtonText: `Don't save`,
-            }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                $.ajax({
-                    url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/save_/')?>',
-                    type:"post",
-                    data: form,
-                    success: function (res){
-                        if(res == 'Berhasil di Simpan'){
-                            location.reload(true);
+                    success: function(res) {
+                        if (res == 'Berhasil di Simpan') {
                             Swal.fire({
                                 title: 'Your has been saved.',
-                                icon:'success',
+                                icon: 'success',
                                 timer: 2000
                             });
-                        }else{
+                            setTimeout(function() {
+                                location.reload(true);
+                            }, 1000);
+                        } else {
                             alert(res);
                         }
                     },
@@ -247,15 +284,15 @@
                         alert('gagal');
                     }
                 });
-                
+
             } else if (result.isDenied) {
                 Swal.fire('Changes are not saved', '', 'info')
             }
         })
-        
+
     }
 
-    function delete_(form){
+    function delete_(form) {
         Swal.fire({
             title: 'Are you sure?',
             text: "Menghapus data ini ?",
@@ -264,21 +301,23 @@
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
+        }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url:'<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/delete_/')?>',
-                    type:"post",
+                    url: '<?= base_url('Setting_parameter/refresment_sertifikasi_smr_c/delete_/') ?>',
+                    type: "post",
                     data: form,
-                    success: function (res){
-                        if(res == 'Berhasil di Hapus'){
+                    success: function(res) {
+                        if (res == 'Berhasil di Hapus') {
                             Swal.fire({
                                 title: 'Your file has been deleted.',
-                                icon:'success',
+                                icon: 'success',
                                 timer: 2000
                             });
-                            location.reload(true);
-                        }else{
+                            setTimeout(function() {
+                                location.reload(true);
+                            }, 1000);
+                        } else {
                             alert(res);
                         }
                     },
@@ -291,38 +330,35 @@
             //     alert('gagal');
             // }
         })
-        
+
     }
 
 
-    function key(tes){
+    function key(tes) {
         names = $(tes).attr('name');
-        term = $("input[type=text][name="+names+"]").val();
+        term = $("input[type=text][name=" + names + "]").val();
         val = {};
         val[names] = term;
 
         $.ajax({
             type: "POST",
-            url: "<?php echo site_url('Setting_parameter/refresment_sertifikasi_smr_c/validate_keyup/');?>", 
+            url: "<?php echo site_url('Setting_parameter/refresment_sertifikasi_smr_c/validate_keyup/'); ?>",
             data: val,
-            dataType: "json",  
-            success: function(data){
+            dataType: "json",
+            success: function(data) {
                 $.each(data, function(key, value) {
-                    if(value == ''){
+                    if (value == '') {
                         $('#input-' + key).removeClass('is-invalid');
                         $('#input-' + key).addClass('is-valid');
                         $('#input-' + key).parents('.form-group').find('#error').html(value);
-                    }else{
+                    } else {
                         $('#input-' + key).addClass('is-invalid');
                         $('#input-' + key).parents('.form-group').find('#error').html(value);
                     }
-                    
+
                 });
             }
         });
 
     }
-    
-
-    
 </script>

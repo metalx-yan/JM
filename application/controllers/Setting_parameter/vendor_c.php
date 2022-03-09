@@ -10,6 +10,7 @@ class vendor_c extends CI_Controller {
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
         access_login();
+        $this->id = 'kode_vendor';
     }
 
     public function index(){
@@ -18,7 +19,8 @@ class vendor_c extends CI_Controller {
         $data['navbar_parent'] = navbar_perent($jabatan);
         $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
-        // $this->My_access->My_access2();
+        $data['access_crud'] = access_crud($this->id);
+        
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
         $this->load->view('Setting_parameter/vendor_v',$data);

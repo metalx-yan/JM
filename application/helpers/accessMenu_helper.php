@@ -46,10 +46,10 @@ function navbar_perent($jabatan)
 function navbar_child($jabatan)
 {
     $ci = get_instance();
-    return $ci->User_model->get_navbar_name($jabatan, 'Child')->result_array();
+    return $ci->User_model->get_child_name($jabatan, 'Child')->result_array();
 }
 
-function access_crud()
+function access_crud($kode_id)
 {
     $ci = get_instance();
     $access_level = $ci->session->userdata('jabatan');
@@ -91,23 +91,38 @@ function access_crud()
 
         $data_access = [
             'access_add' => '',
-            'access_edit' =>  '',
-            'access_delete' => ''
+            'access_edit' =>  [
+                'btn' => '',
+                'visible' => ''
+            ],
+            'access_delete' => [
+                'btn' => '',
+                'visible' => ''
+            ],
         ];
 
         // action cek acess create
         if ($userAccess_add->num_rows() > 0) {
-            $data_access['access_add'] = '1';
+            // $data_access['access_add'] = '1';
+            $data_access['access_add'] = '<button class="btn btn-sm btn-primary" id="add">ADD</button>';
         }
 
         // action cek edit
         if ($userAccess_edit->num_rows() > 0) {
-            $data_access['access_edit'] = '1';
+            // $data_access['access_edit'] = '1';
+            $kode_ = $kode_id;
+            $kode = "'+data." . $kode_ . "+'";
+            $data_access['access_edit']['btn'] = '<button id="btn-edits" value="' . $kode . '" class="btn btn-success m-3" onclick="edit_modal()">Edit</button>';
+            $data_access['access_edit']['visible'] = 'true';
         }
 
         // action cek delete
         if ($userAccess_delete->num_rows() > 0) {
-            $data_access['access_delete'] = '1';
+            // $data_access['access_delete'] = '1';
+            $kode_ = $kode_id;
+            $kode = "'+data." . $kode_ . "+'";
+            $data_access['access_delete']['btn'] =  '<button id="btn-deletes"  value="' . $kode . '" class="btn btn-danger" onclick="delete_modal()">Delete</button>';
+            $data_access['access_delete']['visible'] = 'true';
         }
 
         return $data_access;

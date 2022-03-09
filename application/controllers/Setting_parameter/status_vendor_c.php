@@ -10,7 +10,9 @@ class status_vendor_c extends CI_Controller {
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
         access_login();
+        $this->id = 'kode_status';
     }
+    
 
     public function index(){
         $data['title_head'] = 'Status Vendor';
@@ -18,6 +20,7 @@ class status_vendor_c extends CI_Controller {
         $data['navbar_parent'] = navbar_perent($jabatan);
         $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
+        $data['access_crud'] = access_crud($this->id);
 
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
@@ -61,7 +64,7 @@ class status_vendor_c extends CI_Controller {
         // cek kode 
         $cek_kode = $this->training_parameter->where($data[$field],$table,$field)->num_rows();
         if ($cek_kode > 0) {
-            $msg = 'Kode Ruangan Sudah Ada';
+            $msg = 'Kode Status Vendor Sudah Ada';
         }else{
             $save = $this->training_parameter->save($data,$table);
             if ($save == true) {

@@ -103,7 +103,7 @@
                             <label class="col-sm-2 text-start col-form-label">Staff HCMG</label>
                             <div class="col-sm-4">
                                 <select class="form-select" id="staff_hcmg" aria-label="Default select example">
-                                    <option value="0" selected>Select this Staff HCMG</option>
+                                    <option value="0" selected>-- PILIH STAFF HCMG --</option>
                                     <?php foreach($staff as $row) :?>
                                         <option value="<?= $row->user_name?>"><?= $row->nama?></option>
                                     <?php endforeach;?>

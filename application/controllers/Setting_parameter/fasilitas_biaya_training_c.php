@@ -10,6 +10,7 @@ class fasilitas_biaya_training_c extends CI_Controller {
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
         access_login();
+        $this->id = 'kode_fasilitas';
     }
 
     public function index(){
@@ -18,6 +19,7 @@ class fasilitas_biaya_training_c extends CI_Controller {
         $data['navbar_parent'] = navbar_perent($jabatan);
         $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
+        $data['access_crud'] = access_crud($this->id);
 
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
@@ -48,12 +50,17 @@ class fasilitas_biaya_training_c extends CI_Controller {
         $modal = $this->input->post('modal');
         $id = $this->input->post('id');
         $kode_ = $this->input->post('kode_fasilitas');
+        // var_dump($kode_);die;
+
         $data['kode_fasilitas'] = $this->training_parameter->join_2($kode_,$table,$field,$join,$on_join,$join2,$on_join2)->row();
+
+        // var_dump($id_job);die;
         $data['kode_lokasi'] = $this->training_parameter->get_($join)->result_array();
         $data['kode_cabang'] = $this->training_parameter->get_($join2)->result_array();
         $data['modal_title'] = $modal;
+        $data['form_id'] = $this->input->post('form_id');
         $data['id'] = $id;
-        $html_modal = $this->load->view('Modal/Modal_v',$data,TRUE);
+        $html_modal = $this->load->view('Modal/Modal_fbt',$data,TRUE);
         echo $html_modal;
     }
 

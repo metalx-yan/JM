@@ -7,6 +7,7 @@ class Manage_menu_c extends CI_Controller {
         $this->load->model('User_model');
         $this->load->model('M_Datatables');
         access_login();
+        $this->id = 'menu_name';
     }
 
     public function index(){
@@ -15,6 +16,7 @@ class Manage_menu_c extends CI_Controller {
         $data['navbar_parent'] = navbar_perent($jabatan);
         $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
+        $data['access_crud'] = access_crud($this->id);
 
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);

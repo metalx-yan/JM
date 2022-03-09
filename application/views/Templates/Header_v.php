@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRMS | <?= $title_head ?></title>
+    <title>Job Management | <?= $title_head ?></title>
     <!-- bootstrap 5 css -->
     <link rel="stylesheet" href="<?= base_url('Assets/bootstrap-5/css/bootstrap.min.css')?>">
     <link rel="stylesheet" href="<?= base_url('Assets/bootstrap-icons/font/bootstrap-icons.css')?>">
@@ -20,12 +20,15 @@
     <script src="<?= base_url('Assets/jquery/dist/jquery.min.js')?>"></script>
     <!-- <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script> -->
     <script src="<?= base_url('Assets/DataTables/datatables.min.js')?>"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.bundle.js"></script>
 
     <script src="<?= base_url('Assets/jQuery-Mask-Plugin-master/dist/jquery.mask.min.js');?>"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 
-    <style>
+    <link rel="stylesheet" href="<?= base_url('Assets/css/')?>my_style.css">
+
+    <!-- <style>
 .customcheck {
   position: relative;
 }
@@ -90,7 +93,7 @@
   height: 13px;
   top: 2px;
 }   
-    </style>
+    </style> -->
 
 </head>
 <body>
@@ -102,12 +105,13 @@
         ?>
     
 <!-- Header -->
+<div class="white_content4 text-center mx-auto"  id="loader"><img src="<?= base_url('Assets/images/loading_mega.gif') ?>" width="100px"></div>
     <section class="header-top">
         <!-- <div class="row" style="width:100%"> -->
             <!-- <div class="col-xl-12 col-sm-12 col-md-12" > -->
                 <img width="100%" src="<?= base_url('Assets/images/header.jpg')?>" alt="logo">
                 <div style="margin: -70px 0 0 0;">
-                    <div class="text-center" style="font-size:2.5vw;">Training Resource Management System</div>
+                    <div class="text-center" style="font-size:2.5vw;">Job Management System</div>
                     <!-- <div class="text-left bg-danger"> -->
                     <?php if($title_head !== 'Login'):?>
                     <span style="text-align:right;line-height:20px;">

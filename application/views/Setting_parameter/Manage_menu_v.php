@@ -106,9 +106,6 @@
 
                 <!-- close content -->
             </div>
-            <!-- <div class="modal-footer">
-                <button class="btn btn-primary" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal" data-bs-dismiss="modal">Open second modal</button>
-            </div> -->
         </div>
     </div>
 </div>

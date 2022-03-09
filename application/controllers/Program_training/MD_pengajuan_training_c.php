@@ -14,10 +14,9 @@ class MD_pengajuan_training_c extends CI_Controller
 
     public function index()
     {
-
         $jabatan = $_SESSION['jabatan'];
-        $data['navbar_parent'] = $this->User_model->get_navbar_name($jabatan, 'Parent')->result_array();
-        $data['navbar_child'] = $this->User_model->get_child_name($jabatan, 'Child')->result_array();
+        $data['navbar_parent'] = navbar_perent($jabatan);
+        $data['navbar_child'] = navbar_child($jabatan);
         // var_dump($data['navbar_child']);die;
         $data['title_head'] = 'MD Pengajuan Training';
         $this->load->view('Templates/Header_v', $data);
@@ -48,16 +47,14 @@ class MD_pengajuan_training_c extends CI_Controller
             if ($modal == 'modal') {
                 // get data detail by no md
                 $data_get =  $this->Training_model->read_data(null, null, null, $no_md, $status_proses);
-                // var_dump($data_get);die;
+                
                 $status = json_decode($data_get)->status;
                 if ($status === true) {
                     $data['datas'] = json_decode($data_get)->data;
                     //  get data staff hcmg
                     $get_staff = $this->Training_model->get_staff();
-
-
+                    	
                     $data['staff'] = json_decode($get_staff)->data;
-                    // var_dump($data['staff']);
 
                     // get script tag html
                     $modal_html = $this->load->view('Modal/Modal_program_training', $data, TRUE);

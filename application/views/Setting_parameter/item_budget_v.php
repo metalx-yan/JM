@@ -9,7 +9,7 @@
                             <h6><?= $title_head ?></h6>
                         </div>
                         <div class="col-6 text-end">
-                            <button class="btn btn-sm btn-primary" id="add">ADD</button>
+                            <?= $access_crud['access_add'] ?>
                         </div>
                     </div>
                 </div>
@@ -48,8 +48,6 @@
 </div>
 
 <script>
-
-
     var vm = new Vue({
         // options
         el: '#vueApp',
@@ -110,15 +108,24 @@
                     // { "data": "nominal" },
                     {
                         data: null,
+                        "sortable": false,
                         render: function(data, type, row, meta) {
-                            return '<button class="btn btn-success m-3" onclick="edit_modal()" value="' + data.kode_budget + '">Edit</button> <button class="btn btn-danger" onclick="delete_modal()"  value="' + data.kode_budget + '">Delete</button>';
-                        }
+                            edits = ('<?= $access_crud['access_edit']['visible'] ?>' == '') ? '' : '<?= $access_crud['access_edit']['btn'] ?>'
+                            deletes = ('<?= $access_crud['access_delete']['visible'] ?>' == '') ? '' : '<?= $access_crud['access_delete']['btn'] ?>'
+                            return edits + deletes
+                        },
+                        "visible": ('<?= $access_crud['access_edit']['visible'] ?>' == '' && '<?= $access_crud['access_delete']['visible'] ?>' == '') ? false : true
                     }
                 ],
             });
         }
 
     });
+
+    function close_modal(data_) {
+        action = $(data_).attr('data');
+        $("#" + action).remove();
+    }
 
     $("#add").on('click', () => {
         var val = {};
@@ -131,6 +138,10 @@
             success: function(res) {
                 // alert(res);
                 $(".modal_add").html(res);
+                $('#modal_add').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
                 $('#modal_add').modal('show');
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -152,6 +163,10 @@
             success: function(res) {
                 // alert(res);
                 $(".modal_edit").html(res);
+                $('#modal_edit').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
                 $('#modal_edit').modal('show');
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -172,6 +187,10 @@
             data: val,
             success: function(res) {
                 $(".modal_delete").html(res);
+                $('#modal_delete').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
                 $('#modal_delete').modal('show');
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -183,7 +202,7 @@
     function action_submit(data_) {
         action = $(data_).attr('data');
         $('#error').html(" ");
-        form = $("#task").serialize();
+        form = $("#form_" + action).serialize();
 
         if (action == 'modal_delete') {
             delete_(form);
@@ -225,9 +244,9 @@
         Swal.fire({
             title: 'Do you want to save the changes?',
             showDenyButton: true,
-            showCancelButton: true,
+            showCancelButton: false,
             confirmButtonText: 'Save',
-            denyButtonText: `Don't save`,
+            denyButtonText: `Cancel`,
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
@@ -242,7 +261,9 @@
                                 icon: 'success',
                                 timer: 2000
                             });
-                            location.reload(true);
+                            setTimeout(function() {
+                                location.reload(true);
+                            }, 1000);
                         } else {
                             alert(res);
                         }
@@ -263,9 +284,9 @@
         Swal.fire({
             title: 'Do you want to save the changes?',
             showDenyButton: true,
-            showCancelButton: true,
+            showCancelButton: false,
             confirmButtonText: 'Save',
-            denyButtonText: `Don't save`,
+            denyButtonText: `Cancel`,
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
@@ -275,12 +296,14 @@
                     data: form,
                     success: function(res) {
                         if (res == 'Berhasil di Simpan') {
-                            location.reload(true);
                             Swal.fire({
                                 title: 'Your has been saved.',
                                 icon: 'success',
                                 timer: 2000
                             });
+                            setTimeout(function() {
+                                location.reload(true);
+                            }, 1000);
                         } else {
                             alert(res);
                         }
@@ -319,7 +342,9 @@
                                 icon: 'success',
                                 timer: 2000
                             });
-                            location.reload(true);
+                            setTimeout(function() {
+                                location.reload(true);
+                            }, 1000);
                         } else {
                             alert(res);
                         }

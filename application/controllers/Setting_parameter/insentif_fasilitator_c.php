@@ -10,6 +10,7 @@ class insentif_fasilitator_c extends CI_Controller {
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
         access_login();
+        $this->id = 'kode_insentif';
     }
 
     public function index(){
@@ -18,6 +19,7 @@ class insentif_fasilitator_c extends CI_Controller {
         $data['navbar_parent'] = navbar_perent($jabatan);
         $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
+        $data['access_crud'] = access_crud($this->id);
 
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
@@ -45,6 +47,8 @@ class insentif_fasilitator_c extends CI_Controller {
         $id = $this->input->post('id');
         $kode_ = $this->input->post('kode_insentif');
         $data['kode_insentif'] = $this->training_parameter->where($kode_,$table,$field)->row();
+        // var_dump($data['kode_insentif']);die;
+
         $data['modal_title'] = $modal;
         $data['id'] = $id;
         $html_modal = $this->load->view('Modal/Modal_insentif_fasilitator',$data,TRUE);

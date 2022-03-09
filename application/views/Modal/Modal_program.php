@@ -1,10 +1,10 @@
 <div class="modal fade" id="<?= $id ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
-    <form  id="task">
+    <form  id="form_<?=$id?>">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel"><?= $modal_title ?></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" data="<?= $id?>" onclick="close_modal(this)" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
             
@@ -40,7 +40,7 @@
             
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <button type="button" data="<?= $id?>" onclick="close_modal(this)"  class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" data="<?= $id?>" onclick="action_submit(this)" class="btn <?php echo (( $id == 'modal_delete')? 'btn-danger' : 'btn-primary' ) ?>  action_add"><?php echo (( $id == 'modal_delete')? 'DELETE DATA' : 'SAVE CHANGES' ) ?></button>
       </div>
       </form>

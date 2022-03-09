@@ -10,6 +10,7 @@ class fasilitator_c extends CI_Controller {
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
         access_login();
+        $this->id = 'kode_fasilitator';
     }
 
     public function index(){
@@ -18,6 +19,7 @@ class fasilitator_c extends CI_Controller {
         $data['navbar_parent'] = navbar_perent($jabatan);
         $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
+        $data['access_crud'] = access_crud($this->id);
 
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
@@ -46,7 +48,7 @@ class fasilitator_c extends CI_Controller {
         $join = 'vendor';
         $id = $this->input->post('id');
         $kode_ = $this->input->post('kode_fasilitator');
-        $data['kode_fasilitator'] = $this->training_parameter->join_($kode_,$table,$field,$join, $on_join)->row();
+        $data['kode_fasilitator'] = $this->training_parameter->select_join($kode_,$table,$field,$join, $on_join)->row();
         $data['vendor'] = $this->training_parameter->get_('vendor')->result_array();
         $data['modal_title'] = $modal;
         $data['id'] = $id;

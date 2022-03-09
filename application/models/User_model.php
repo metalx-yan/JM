@@ -18,7 +18,7 @@ class User_model extends CI_Model {
     }
 
     public function level_user_where($id){
-        return $this->db->get_where('level_user',['id'=>$id])->row_array();
+        return $this->db->get_where('level_user',['id'=>$id])->row();
     }
 
    public function get_parent(){
@@ -29,12 +29,14 @@ class User_model extends CI_Model {
    }
 
    public function get_navbar_name($jabatan,$type){
-        $this->db->select('menu.menu_name,type,file,parent,menu.id_menu');
+        $this->db->select('menu.*,level_detail.tampil,c.id_menu as childs');
         $this->db->join('level_detail','level_detail.id_menu = menu.id_menu','left');
-        $this->db->where('type',$type);
-        $this->db->where('is_menu','Yes');
+        $this->db->join('menu as c','c.parent = menu.id_menu','left');
+        $this->db->where('menu.type',$type);
+        $this->db->where('menu.is_menu','Yes');
         $this->db->where('level_detail.id_level',$jabatan);
         $this->db->where('level_detail.tampil','1');
+        $this->db->group_by('menu.id_menu');
         $this->db->order_by('menu.position','ASC');
         return $this->db->get('menu');
    }
@@ -46,7 +48,6 @@ class User_model extends CI_Model {
         $this->db->where('is_menu','Yes');
         $this->db->where('level_detail.id_level',$jabatan);
         $this->db->where('level_detail.tampil','1');
-        $this->db->group_by('id_menu');
         $this->db->order_by('menu.position','ASC');
         return $this->db->get('menu');
     }
@@ -71,6 +72,7 @@ class User_model extends CI_Model {
         $this->db->join('level_detail','level_detail.id_menu = menu.id_menu','inner');
         $this->db->where('parent',$parent);
         $this->db->where('is_menu','Yes');
+        $this->db->order_by('menu.position','ASC');
         // $this->db->group_by('menu.id_menu');
         return $this->db->get('menu');
     //    

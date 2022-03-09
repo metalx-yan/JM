@@ -22,4 +22,5 @@ class Home_c extends CI_Controller
         $this->load->view('Homev');
         $this->load->view('Templates/Footer_v');
     }
+
 }

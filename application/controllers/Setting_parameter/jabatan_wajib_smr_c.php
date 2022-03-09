@@ -10,6 +10,7 @@ class jabatan_wajib_smr_c extends CI_Controller {
         $this->load->library('form_validation');
         $this->db_training = $this->load->database('training', TRUE);
         access_login();
+        $this->id = 'kode_jabatan';
     }
 
     public function index(){
@@ -18,6 +19,7 @@ class jabatan_wajib_smr_c extends CI_Controller {
         $data['navbar_parent'] = navbar_perent($jabatan);
         $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
+        $data['access_crud'] = access_crud($this->id);
 
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
@@ -110,11 +112,11 @@ class jabatan_wajib_smr_c extends CI_Controller {
     function validate(){
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
-            if ($key == 'kode_jabatan') {
-                $require = '';
-            }else{
+            // if ($key == 'kode_jabatan') {
+            //     $require = '';
+            // }else{
                 $require = 'required|trim';
-            }
+            // }
             $this->form_validation->set_rules($key,$key,$require);
         }
 
@@ -137,11 +139,11 @@ class jabatan_wajib_smr_c extends CI_Controller {
         $this->form_validation->set_error_delimiters('', '');
         foreach($_POST as $key => $val){
             if ($key == $key) {
-                if ($key == 'kode_jabatan') {
-                    $require = '';
-                }else{
+                // if ($key == 'kode_jabatan') {
+                //     $require = '';
+                // }else{
                     $require = 'required|trim';
-                }
+                // }
                 $this->form_validation->set_rules($key,$key,$require);
             }
         }
