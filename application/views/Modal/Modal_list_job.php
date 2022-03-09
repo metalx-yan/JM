@@ -77,9 +77,9 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3 row">
-                                                <label class="col-sm-5 col-form-label">Job Discipline : </label>
+                                                <label class="col-sm-5 col-form-label">Purpose : </label>
                                                 <div class="col-sm-7 form-group d-flex align-content-around flex-wrap">
-                                                    <textarea name="purpose" id="" cols="30" rows="4" class="form-control"></textarea>
+                                                    <textarea name="purpose" id="" style="rezise:none;" disabled cols="30" rows="4" class="form-control"><?=  $list['purpose'] ?></textarea>
                                                 </div>
                                             </div>
                                             <div class="mb-3 row">

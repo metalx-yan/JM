@@ -114,8 +114,11 @@ class Job_m_c extends CI_Controller {
             $data[$key] = $val;
         }
         // var_dump($data);die;
-        $this->training_parameter->delete_single($data['job_list_id'],$_POST['eksekutor'],'job_list_id');
-        // $this->training_parameter->delete_single($data['job_list_id'],$_POST['eksekutor'],'job_list_id');
+        if ($data['eksekutor'] == 'tugas') {
+            $this->training_parameter->delete_single($data['job_list_id'],'tugas_tanggung_jawab','job_list_id');
+        } else {
+            $this->training_parameter->delete_single($data['job_list_id'],$_POST['eksekutor'],'job_list_id');
+        }
         
         if ($data['eksekutor'] == 'kualifikasi') {
             $result = [];
@@ -126,8 +129,17 @@ class Job_m_c extends CI_Controller {
                 $result[$i]['job_list_id'] = $data['job_list_id'];
                 $result[$i]['work_experience'] = implode('-',$data['description']);
             }
-            
-                $save = $this->db_jobmanagement->insert_batch($_POST['eksekutor'],$result);
+            $save = $this->db_jobmanagement->insert_batch($_POST['eksekutor'],$result);
+
+        } else if ($data['eksekutor'] == 'tugas') {
+            $result = [];
+            for ($i=0; $i < count($data['field_tugas']); $i++) { 
+                $result[$i]['job_list_id'] = $data['job_list_id'];
+                $result[$i]['job_family'] = $data['job_family'];
+                $result[$i]['job_category'] = $data['job_category'];
+                $result[$i]['description'] = $data['field_tugas'][$i];
+            }
+            $save = $this->db_jobmanagement->insert_batch('tugas_tanggung_jawab',$result);
 
         } else {
             foreach($_POST['field_'.$_POST['eksekutor']] as $key => $val){
@@ -137,9 +149,8 @@ class Job_m_c extends CI_Controller {
             }
             
         }
-        // var_dump($save);die;
 
-        if ($data['eksekutor'] == 'kualifikasi') {
+        if ($data['eksekutor'] == 'kualifikasi' || $data['eksekutor'] == 'tugas') {
             if ($save == true) {
                 $msg = 'Berhasil di Simpan';
             }else{
@@ -171,6 +182,9 @@ class Job_m_c extends CI_Controller {
         $table_kualifikasi = 'kualifikasi';
         $table_workexperience = 'work_experience';
         $table_tingkatpendidikan = 'edu_lvl';
+        $table_jobfamily = 'job_family';
+        $table_tugas_tanggung_jawab = 'tugas_tanggung_jawab';
+        $table_category = 'job_category';
         $on1 = 'job_name';
         $on2 = 'id_job';
         $field_id = 'list_jobs.id';
@@ -198,24 +212,44 @@ class Job_m_c extends CI_Controller {
         $data['tujuan_id'] = $this->training_parameter->join_distinct(
            $table_tujuan_jabatan,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'tujuan_jabatan.id id_tujuan_jabatan,tujuan_jabatan.tujuan,list_jobs.id'
         )->row();
+        
         $data['kewenangan_id'] = $this->training_parameter->join_distinct(
             $table_kewenangan,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kewenangan.id id_kewenangan,kewenangan.kewenangan,list_jobs.id'
          )->result_array();
 
         $data['kompetensi_id'] = $this->training_parameter->join_distinct(
-        $table_kompetensi,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kompetensi.id id_kompetensi,kompetensi.kompetensi,list_jobs.id'
-        )->result_array();
+            $table_kompetensi,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kompetensi.id id_kompetensi,kompetensi.kompetensi,list_jobs.id'
+            )->result_array();
 
         $data['kpi_id'] = $this->training_parameter->join_distinct(
             $table_kpi,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kpi.id id_kpi,kpi.kpi,list_jobs.id'
             )->result_array();
         
+        $data['desc_tugas_tanggung_jawab_id'] = $this->training_parameter->join_distinct(
+            $table_tugas_tanggung_jawab,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'tugas_tanggung_jawab.description,list_jobs.id'
+            )->result_array();
+
+        $data['job_family'] = $this->training_parameter->get_($table_jobfamily)->result_array();
+        
+        $data['job_category'] = $this->training_parameter->get_($table_category)->result_array();
+
+        $query_tugas = "SELECT a.id id_list_job , c.id_job_family, c.job_family, d.id id_job_cateogory, d.job_category from list_jobs a
+        join tugas_tanggung_jawab b
+        on a.id = b.job_list_id
+        join job_family c
+        on b.job_family = c.id_job_family
+        join job_category d
+        on b.job_category = d.id
+        where b.job_list_id = $position_id";
+
         $query = "SELECT a.id id_kualifikasi,a.persyaratan_khusus, b.id id_tingkat_pendidikan, b.edu_name, c.id id_jurusan, c.edu_mjr,a.work_experience from kualifikasi a
         join edu_lvl b
         on a.tingkat_pendidikan = b.id
         join edu_mjr c
         on a.jurusan = c.id
         where a.job_list_id = $position_id ";
+
+        $data['tugas_tanggung_jawab_id'] = $this->db_jobmanagement->query($query_tugas)->row();
 
         $data['kualifikasi_id'] = $this->db_jobmanagement->query($query)->result_array();
 
@@ -290,7 +324,6 @@ class Job_m_c extends CI_Controller {
         $select2 = 'edu_mjr';
         
         $get_data = $this->training_parameter->where_distinct($kode,$table,$field,$select1,$select2)->result_array();
-        // var_dump($get_data);die;
         $loop = '';
         foreach($get_data as $data):
             $loop .= '<option value="'.$data[$select1].'">'.$data[$select2].'</option>';

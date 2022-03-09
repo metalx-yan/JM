@@ -161,7 +161,7 @@ function action_submit(data_) {
         delete_();
     } else {
         console.log(action)
-        if (action == 'kualifikasi') {
+        if (action == 'kualifikasi'  || action == 'tugas') {
             $.ajax({
                 type: "POST",
                 url: "<?php echo site_url('Management/Job_m_c/validate_kual'); ?>",
@@ -193,6 +193,7 @@ function action_submit(data_) {
                 data: form,
                 dataType: "json",
                 success: function(data) {
+                    // console.log(data);
                     if (data.action == 'ok') {
                        if (action == 'tujuan') {
                             save(form);
@@ -249,6 +250,20 @@ $(document).ready(function() {
     });
 
 });
+
+function check_dropdown(data_) {
+    action = $(data_).attr('id');
+    action_data = $(data_).attr('data');
+    // console.log(action_data)
+    var value = $('#'+action +' option:selected').text();
+    var val = {};
+    val.tingkat_pendidikan = value;
+    $.post('<?php echo base_url()?>Management/Job_m_c/change_jurusan',val,function(data){ 
+        $('.jurusan'+action_data).html(data);
+        // console.log(data)
+    });
+
+}
 
 function close_modal(data_) {
     action = $(data_).attr('data');
@@ -318,15 +333,15 @@ function save_multiple(form) {
                 success: function(res) {
                     console.log(res)
                     if (res == 'Berhasil di Simpan') {
-                        $('#modal_edit').modal('hide');
+                        // $('#modal_edit').modal('hide');
                         Swal.fire({
                             title: 'Your has been saved.',
                             icon: 'success',
                         });
 
-                        setTimeout(function() {
-                            location.reload(true);
-                        }, 1000);
+                        // setTimeout(function() {
+                        //     location.reload(true);
+                        // }, 1000);
                     } else {
                         alert(res)
                         // console.log(res)
@@ -346,6 +361,7 @@ function edit_modal() {
     val.id = 'modal_edit';
     val.form_id = "form_" + val.id;
     val.position = event.target.value;
+    // console.log(val.position)
     val.tujuan = 'tujuan';
     val.tugas = 'tugas';
     val.kewenangan = 'kewenangan';
@@ -384,19 +400,33 @@ function edit_modal() {
     });
 };
 
+function navtab(data_){
+    action = $(data_).attr('data');
+    var data_navtab = $('div#inputFormRow_'+action).length;
+    console.log(data_navtab)
+    if (data_navtab > 0) {
+        $('.btn_save_'+action).attr('disabled', false);
+    } else {
+        $('.btn_save_'+action).attr('disabled', true);
+    }
+    // console.log(data_navtab);
+}
+
 function tabs(data_) {
     action = $(data_).attr('data');
     var arr = []
     arr.push($('div#inputFormRow_'+action))
+    var test = '';
     if (arr[0].length >= 0 ) {
         $('.btn_save_'+action).attr('disabled', false);
-    } 
-    console.log(arr[0].length);
+        test = arr[0].length+1;
+    } else {
+        test = arr[0].length;
+    }
     // add row
-    
     var html = '';
     if (action == 'kualifikasi') {
-        html = '<div id="inputFormRow_'+ action +'"><div class="row"><div class="col-md-3"> <label for="">Tingkat Pendidikan</label><select name="tingkat_pendidikan[]" id="input-tingkat_pendidikan'+arr[0].length+'" class="form-select form-select-sm" aria-label=".form-select-sm example"><?php foreach($tingkat_pendidikan as $tingkat):?><option value="<?= $tingkat['id']?>"><?= $tingkat['edu_name']; ?></option><?php endforeach; ?></select><span id="error"></span></div><div class="col-md-3"> <label for="">Jurusan</label><select name="jurusan[]" id="input-jurusan" class="form-select form-select-sm jurusan_'+arr[0].length+'" aria-label=".form-select-sm example"> </select> <span id="error"></span></div> <div class="col-md-3"><label for="">Persyaratan Khusus</label><input type="text" id="input-syarat"  value="<?php echo (('a') ? '' : '') ?>" name="syarat[]" class="form-control form-control-sm" required> <span id="error"></span></div><div class="col-md-3 d-flex align-content-end flex-wrap"><button id="removeRow_'+ action +'" data="'+ action +'" onclick="dels(this)" type="button" class="btn btn-danger btn-sm">Remove</button></div></div></div>';
+        html = '<div id="inputFormRow_'+ action +'"><div class="row"><div class="col-md-3"> <label for="">Tingkat Pendidikan</label><select name="tingkat_pendidikan[]" id="input-tingkat_pendidikan'+test+'" class="form-select form-select-sm" aria-label=".form-select-sm example"><?php foreach($tingkat_pendidikan as $tingkat):?><option value="<?= $tingkat['id']?>"><?= $tingkat['edu_name']; ?></option><?php endforeach; ?></select><span id="error"></span></div><div class="col-md-3"> <label for="">Jurusan</label><select name="jurusan[]" id="input-jurusan" class="form-select form-select-sm jurusan'+test+'" aria-label=".form-select-sm example"> </select> <span id="error"></span></div> <div class="col-md-3"><label for="">Persyaratan Khusus</label><input type="text" id="input-syarat"  value="<?php echo (('a') ? '' : '') ?>" name="syarat[]" class="form-control form-control-sm" required> <span id="error"></span></div><div class="col-md-3 d-flex align-content-end flex-wrap"><button id="removeRow_'+ action +'" data="'+ action +'" onclick="dels(this)" type="button" class="btn btn-danger btn-sm">Remove</button></div></div></div>';
         
     } else {
         var html = '<div id="inputFormRow_'+ action+ '"><div class="input-group mb-3"><input type="text" name="field_'+action+'[]" class="form-control form-control-sm m-input enter_'+action +'" placeholder="" autocomplete="off"><div class="input-group-append"><button id="removeRow_' +action+ '"  data="'+action+'" onclick="dels(this)" type="button" class="btn btn-danger btn-sm">Remove</button></div></div>';
@@ -404,15 +434,15 @@ function tabs(data_) {
 
     $('#newRow_'+action).append(html);
 
-    $('#input-tingkat_pendidikan'+arr[0].length).change(function(){ 
+    $('#input-tingkat_pendidikan'+test).change(function(){ 
         var value = $(this).val();
-        var value = $('#input-tingkat_pendidikan'+arr[0].length+' option:selected').text();
+        var value = $('#input-tingkat_pendidikan'+test+' option:selected').text();
         var val = {};
         val.tingkat_pendidikan = value;
         console.log(value)
         $.post('<?php echo base_url()?>Management/Job_m_c/change_jurusan',val,function(data){ 
         console.log(data);
-            $('.jurusan_'+arr[0].length).html(data);
+            $('.jurusan'+test).html(data);
         });
     });
 }

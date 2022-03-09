@@ -149,7 +149,7 @@ class Position_c extends CI_Controller {
         $data['posisi'] = $this->training_parameter->where_group($table,$field_position_name,
         $field1,$field_position_name,$position_id)->row();
        
-        $query = "SELECT distinct a.id id_list_job,b.position_id,c.id_job,d.id_job_function,e.id_job_family,f.id id_sub_function,g.id id_sub_family,h.Discipline_Code,b.position_name,c.job_title,d.job_function,e.job_family,f.job_sub_function,g.job_sub_family
+        $query = "SELECT distinct a.id id_list_job,a.purpose,b.position_id,c.id_job,d.id_job_function,e.id_job_family,f.id id_sub_function,g.id id_sub_family,h.Discipline_Code,b.position_name,c.job_title,d.job_function,e.job_family,f.job_sub_function,g.job_sub_family
         ,h.Discipline_Description
         from list_jobs a
         join posisi b

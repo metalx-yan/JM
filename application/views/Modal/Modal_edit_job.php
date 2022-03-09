@@ -48,22 +48,22 @@
                 <div class="row">
                     <ul class="nav nav-tabs" id="myTab" style="font-size: 12px; color:yellow;">
                         <li class="nav-item">
-                            <button href="#tujuan"  class="nav-link active" data-bs-toggle="tab">Tujuan Jabatan</button>
+                            <button href="#tujuan" class="nav-link active" data-bs-toggle="tab">Tujuan Jabatan</button>
                         </li>
                         <li class="nav-item">
-                            <button href="#tugas"  class="nav-link" data-bs-toggle="tab">Tugas & Tanggung Jawab</button>
+                            <button href="#tugas" onclick="navtab(this)" data="tugas" class="nav-link" data-bs-toggle="tab">Tugas & Tanggung Jawab</button>
                         </li>
                         <li class="nav-item">
-                            <button href="#kewenangan" class="nav-link" data-bs-toggle="tab">Kewenangan</button>
+                            <button href="#kewenangan" onclick="navtab(this)" data="kewenangan" class="nav-link" data-bs-toggle="tab">Kewenangan</button>
                         </li>
                         <li class="nav-item">
-                            <button href="#kualifikasi"  class="nav-link" data-bs-toggle="tab">Kualifikasi</button>
+                            <button href="#kualifikasi" onclick="navtab(this)" data="kualifikasi" class="nav-link" data-bs-toggle="tab">Kualifikasi</button>
                         </li>
                         <li class="nav-item">
-                            <button href="#kompetensi" class="nav-link" data-bs-toggle="tab">Kompetensi</button>
+                            <button href="#kompetensi" onclick="navtab(this)" data="kompetensi" class="nav-link" data-bs-toggle="tab">Kompetensi</button>
                         </li>
                         <li class="nav-item">
-                            <button href="#kpi" data="kpi" class="nav-link" data-bs-toggle="tab">KPI</button>
+                            <button href="#kpi" onclick="navtab(this)" data="kpi" class="nav-link" data-bs-toggle="tab">KPI</button>
                         </li>
                     </ul>
                     <div class="tab-content">
@@ -86,7 +86,8 @@
                         <div class="tab-pane fade" id="tugas">
                             <br>
                           <form id="form_<?= $tugas ?>">
-
+                          <input type="hidden" value="<?php echo (($id_job) ? $id_job->id : '') ?>" name="job_list_id">
+                            <input type="hidden" value="<?= $tugas ?>" name="eksekutor">
                             <div class="mb-3 row">
                                 <label class="col-sm-5 col-form-label">Nama Posisi</label>
                                 <div class="col-sm-7 form-group d-flex align-content-around flex-wrap">
@@ -98,7 +99,12 @@
                             <div class="mb-3 row">
                                 <label class="col-sm-5 col-form-label">Job Family</label>
                                 <div class="col-sm-7 form-group">
-                                    <select onchange="check_v(this)" name="job_family" id="input-job_family" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                                    <select onchange="check_v(this)" name="job_family" id="input-job_family" class="form-select form-select-sm" aria-label=".form-select-sm example" >
+                                    <option value="<?= (( $tugas_tanggung_jawab_id)? $tugas_tanggung_jawab_id->id_job_family : '' )?>" selected><?php echo (( $tugas_tanggung_jawab_id)? $tugas_tanggung_jawab_id->job_family : '' ) ?></option>
+                                    <?php foreach($job_family as $data_family):?>
+                                        <option value="<?= $data_family['id_job_family']?>"><?= $data_family['job_family']?></option>
+                                    <?php endforeach; ?>
+
                                     </select>
                                 <span id="error"></span>
                                 </div>
@@ -108,7 +114,10 @@
                                 <label class="col-sm-5 col-form-label">Job Category</label>
                                 <div class="col-sm-7 form-group">
                                     <select onchange="check_v(this)" name="job_category" id="input-job_category" class="form-select form-select-sm job_category" aria-label=".form-select-sm example">
-                                        <!-- <option value="<?= (( $id_job)? $id_job->job_title : '' )?>" selected><?php echo (( $id_job)? $id_job->job_title : '' ) ?></option> -->
+                                    <option value="<?= (( $tugas_tanggung_jawab_id)? $tugas_tanggung_jawab_id->id_job_cateogory : '' )?>" selected><?php echo (( $tugas_tanggung_jawab_id)? $tugas_tanggung_jawab_id->job_category : '' ) ?></option>
+                                    <?php foreach($job_category as $data_category):?>
+                                        <option value="<?= $data_category['id']?>"><?= $data_category['job_category']?></option>
+                                    <?php endforeach; ?>>
                                     </select>
                                     <span id="error"></span>
                                 </div>
@@ -116,14 +125,16 @@
 
                             <div class="mb-3 row">
                                 <div class="col-sm-12 form-group">
+                                    <?php foreach($desc_tugas_tanggung_jawab_id as $data_desc_tugas_tanggung_jawab):?>
                                         <div id="inputFormRow_<?= $tugas ?>">
-                                            <div class="input-group mb-3">
-                                                <input type="text" name="field_<?= $tugas ?>[]" class="form-control form-control-sm m-input enter_<?= $tugas?>" placeholder="" autocomplete="off">
-                                                <div class="input-group-append">
-                                                    <button id="removeRow_<?= $tugas ?>" data="<?= $tugas ?>" onclick="dels(this)" type="button" class="btn btn-danger btn-sm">Remove</button>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" name="field_<?= $tugas ?>[]" class="form-control form-control-sm m-input enter_<?= $tugas?>" value="<?= $data_desc_tugas_tanggung_jawab['description'] ?>" placeholder="" autocomplete="off">
+                                                    <div class="input-group-append">
+                                                        <button id="removeRow_<?= $tugas ?>" data="<?= $tugas ?>" onclick="dels(this)" type="button" class="btn btn-danger btn-sm">Remove</button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        <?php endforeach; ?>
 
                                         <div id="newRow_<?= $tugas ?>"></div>
                                         <button id="addRow_<?= $tugas ?>" data="<?= $tugas ?>" onclick="tabs(this)" type="button" class="btn btn-primary btn-sm">Add Row</button>
@@ -131,7 +142,7 @@
                                 </div>
                             </div>
 
-                            <button type="button" data="<?= $tugas ?>" onclick="action_submit(this)" class="btn btn-warning float-end">SAVE</button>
+                            <button type="button" data="<?= $tugas ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $tugas ?>">SAVE</button>
                             
                         </form>
 
@@ -190,15 +201,15 @@
                                 </div>
                             </div>
                             
+                            <?php $no_tingkat = 1; $no_data = 1; $no_jurusan = 1;?>           
                             <?php foreach($kualifikasi_id as $data_kualifikasi):?>
-                                        
                             <div id="inputFormRow_<?= $kualifikasi ?>">
                             <input type="hidden" value="<?php echo (($id_job) ? $id_job->id : '') ?>" name="job_list_id">
                             <input type="hidden" value="<?= $kualifikasi ?>" name="eksekutor">
                                 <div class="row">
                                     <div class="col-md-3">
                                         <label for="">Tingkat Pendidikan</label>
-                                        <select name="tingkat_pendidikan[]" id="input-tingkat_pendidikan" class="form-select form-select-sm" aria-label=".form-select-sm example" >
+                                        <select name="tingkat_pendidikan[]"  data="<?= $no_data++ ?>"  onchange="check_dropdown(this)" id="input-tingkat_pendidikan<?= $no_tingkat++ ?>"class="form-select form-select-sm" aria-label=".form-select-sm example" >
                                             <option value="<?= $data_kualifikasi['id_tingkat_pendidikan'] ?>"><?= $data_kualifikasi['edu_name'] ?></option>
                                             <?php foreach($tingkat_pendidikan as $tingkat):?>
                                                 <option value="<?= $tingkat['id']?>"><?= $tingkat['edu_name']; ?></option>
@@ -209,7 +220,7 @@
 
                                     <div class="col-md-3">
                                         <label for="">Jurusan</label>
-                                        <select name="jurusan[]" id="input-jurusan" class="form-select form-select-sm jurusan" aria-label=".form-select-sm example">
+                                        <select name="jurusan[]" id="input-jurusan" class="form-select form-select-sm jurusan<?= $no_jurusan++ ?>" aria-label=".form-select-sm example">
                                         <option value="<?= $data_kualifikasi['id_jurusan'] ?>"><?= $data_kualifikasi['edu_mjr'] ?></option>
                                             
                                         </select>
