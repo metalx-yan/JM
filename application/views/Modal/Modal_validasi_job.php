@@ -9,11 +9,6 @@
         <div class="mb-3 row">
           <div class="col-sm-7 form-group">
             <input type="hidden" id="input-id_job" onkeyup="key(this)" value="<?php echo (($id_job) ? $id_job->id : '') ?>" name="id" class="form-control" required <?php echo (($id == 'modal_edit' || $id == 'modal_delete') ? 'readonly' : '') ?>>
-            <input type="hidden" id="input-id_position" onkeyup="key(this)" value="<?php echo (($position) ? $position->position_id : '') ?>" name="position_id" class="form-control" required <?php echo (($id == 'modal_edit' || $id == 'modal_delete') ? 'readonly' : '') ?>>
-            <input type="hidden" name="status" value="0">
-            <input type="hidden" name="user_name" value="<?= $username_login ?>">
-            <input type="hidden" name="form_" value="">
-
             <div id="error"></div>
           </div>
         </div>
@@ -39,7 +34,7 @@
             <label class="col-sm-5 col-form-label">Functional Group</label>
             <div class="col-sm-7 form-group">
             <select onchange="check_v(this)" name="function_group" id="input-function_group" class="form-select form-select-sm" aria-label=".form-select-sm example" <?php echo (( $id == 'modal_delete')? 'disabled' : '' ) ?> required>
-            <option value="<?= (( $id_job)? $id_job->func_group_id : '' )?>" selected><?php echo (( $id_job)? $id_job->func_group_id : '' ) ?></option>
+            <option value="<?= (( $id_job)? $id_job->function_group : '' )?>" selected><?php echo (( $id_job)? $id_job->function_group : '' ) ?></option>
                 <?php foreach($functional_group as $funcgroup):?>
                     <option value="<?= $funcgroup['func_group_id']?>"><?= $funcgroup['func_group_id']; ?></option>
                 <?php endforeach; ?>
@@ -115,7 +110,7 @@
             <div class="mb-3 row">
               <label class="col-sm-5 col-form-label">Purpose</label>
               <div class="col-sm-7 form-group">
-              <textarea name="purpose" cols="30" rows="4" class="form-control" style="resize: none;"></textarea>
+              <textarea name="purpose" id="" cols="30" rows="4" class="form-control" style="resize: none;"><?= $id_job->purpose?></textarea>
               <span id="error"></span>
               </div>
             </div>
@@ -137,8 +132,9 @@
         </div>
         </div>
         <div class="modal-footer">
-          <button type="button" data="<?= $id ?>" onclick="close_modal(this)" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" data="<?= $id ?>" onclick="action_submit(this)" class="btn <?php echo (($id == 'modal_delete') ? 'btn-danger' : 'btn-primary') ?>  action_add"><?php echo (($id == 'modal_delete') ? 'DELETE DATA' : 'SAVE CHANGES') ?></button>
+          <!-- <button type="button" data="<?= $id ?>" onclick="close_modal(this)" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+          <button type="button" data="save" onclick="action_submit(this)" class="btn btn-primary">Save</button>
+          <button type="button" data="approve" onclick="action_submit(this)" class="btn btn-primary">Approve</button>
         </div>
       </form>
     </div>

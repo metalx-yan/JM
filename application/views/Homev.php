@@ -52,6 +52,8 @@
       </div>
     </div>
   </div>
+  <div class="modal_view"></div>
+  </section>
 
   <script>
     $(document).ready(function() {
@@ -210,17 +212,13 @@
         "columns": [
            
                 {
-                    "data": 'position_id',
-                    "sortable": false,  
-                    render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
+                    "data": "position_id"
+                },
+                {
+                    "data": "job_title"
                 },
                 {
                     "data": "position_name"
-                },
-                {
-                    "data": "job_name"
                 },
                 {
                     "data": "nama"
@@ -229,7 +227,7 @@
                     data: null,
                     "sortable": false,
                     render: function(data, type, row, meta) {
-                        views = '<button id="btn-views"  value="'+data.position_id+'" class="btn btn-warning m-3" onclick="view_modal()">View</button>'
+                        views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="view_modal()">View</button>'
                         return views
                     },
 
@@ -238,10 +236,68 @@
               
             ],
     });
+  })
 
+    function view_modal() {
+        var val = {};
+        val.modal = 'MODAL VIEW JOB';
+        val.id = 'modal_view';
+        val.form_id = "form_" + val.id;
+        val.job = event.target.value;
+        console.log(val);
+        $.ajax({
+            url: '<?= base_url('/Home_c/modal_view/') ?>',
+            type: "post",
+            data: val,
+            success: function(res) {
+                $(".modal_view").html(res);
+                $('#modal_view').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                $('#modal_view').modal('show');
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert('gagal');
+            }
+        });
+    };
 
-    })
+    function action_submit(data_) {
+      action = $(data_).attr('data');
+      $('#error').html(" ");
+      form = $(action).serialize();
+      console.log(form)
+    
+        $.ajax({
+            type: "POST",
+            url: "<?php echo site_url('Management/Position_c/validate'); ?>",
+            data: form,
+            dataType: "json",
+            success: function(data) {
+                
+                if (data.action == 'ok') {
+                    if (action == 'save') {
+                        save(form);
+                    } else {
+                        approve(form);
+                    }
+                } else {
+                    $.each(data, function(key, value) {
+                        if (value == '') {
+                            $('#input-' + key).removeClass('is-invalid');
+                            $('#input-' + key).addClass('is-valid');
+                            $('#input-' + key).parents('.form-group').find('#error').html(value);
+                        } else {
+                            $('#input-' + key).addClass('is-invalid');
+                            $('#input-' + key).parents('.form-group').find('#error').html(value);
+                        }
+                    });
+                }
 
+            }
+        });
+  }
 
     // var data2 = {
     //   labels: [
@@ -292,5 +348,3 @@
     // });
   </script>
 
-
-</section>

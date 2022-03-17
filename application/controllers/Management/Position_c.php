@@ -467,7 +467,24 @@ class Position_c extends CI_Controller {
                         $msg = 'Gagal Menyimpan';
                     }
                 } else {
-                    $save = $this->training_parameter->save($data,$table);
+                    $data_create_job_sec = array(
+                        'job_name' => $data['job_name'],
+                        'function_group' => $data['function_group'],
+                        'job_function' => $data['job_function'],
+                        'job_sub_function' => $data['job_sub_function'],
+                        'job_family' => $data['job_family'],
+                        'job_sub_family' => $data['job_sub_family'],
+                        'job_discipline' => $data['job_discipline'],
+                        'purpose' => $data['purpose'],
+                        'career_band' => $data['career_band'],
+                        // 'career_level' => $data['career_level'],
+                        // 'grade' => $data['grade'],
+                        'created_at' => $data['created_at'],
+                        'position_id' => $data['position_id'],
+                        'status' => $data['status'],
+                        'user_name' => $data['user_name'],
+                    );
+                    $save = $this->training_parameter->save($data_create_job_sec,$table);
                     if ($save == true) {
                         $msg = 'Berhasil di Simpan';
                     }else{
