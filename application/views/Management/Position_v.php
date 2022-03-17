@@ -12,7 +12,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="card">
+                <?php if($jabatan == '100') {?>
+                    <div class="card">
                     <div class="card-header">
                       Search
                     </div>
@@ -75,10 +76,59 @@
                       </table>
                     </div>
                   </div>
+                  <?php } else if($jabatan == '101') { ?>
+                    <div class="card">
+                    <div class="card-header">
+                      Search
+                    </div>
+                    <form id="form_search">
+
+                      <div class="card-body">
+                            <div class="mb-3 row">
+                              <label class="col-sm-5 col-form-label">Position</label>
+                              <div class="col-sm-7 form-group">
+                              <select onchange="check_v(this)" name="posisi" id="input-posisi" class="form-select form-select-sm" data-live-search="true" aria-label=".form-select-sm example" required>
+                                <option value="" selected></option>
+                                <?php foreach($position as $p):?>
+                                    <option value="<?= $p['position_name']?>"><?= $p['position_name']; ?></option>
+                                <?php endforeach; ?>
+                              </select>
+                              <span id="error"></span>
+                              </div>
+                            </div>
+
+                              <button type="button" data="search" onclick="subsearch(this)" class="btn btn-warning float-end">Search</button>
+                              <br>
+                      </div>
+                      </form>
+                  </div>
+                  <br>
+                  <div class="card">
+                    <div class="card-header">
+                      List Job
+                    </div>
+                    <div class="card-body">
+                      <table id="manage_menu_sec" class="table table-bordered table-striped text-center align-middle" width="100%">
+                        <thead>
+                            <tr class="text-center">
+                                <th>No</th>
+                                <th>Kode Posisi</th>
+                                <th>Nama Posisi</th>
+                                <th>Nama Job</th>
+                                <th>Status</th>
+                                <th>Job</th>
+                            </tr>
+                        </thead>
+                      </table>
+                    </div>
+                    
+                  </div>
+                  <?php } ?>
             </div>
         </div>
     </div>
     <div class="modal_add"></div>
+    <div class="modal_send"></div>
     <div class="modal_view"></div>
 
 </section>
@@ -91,59 +141,124 @@ function subsearch(data_) {
   val.direktorat = $('#input-direktorat').val()
   val.organisasi = $('#input-organisasi').val()
   val.posisi = $('#input-posisi').val()
-  search(val);
+//   search(val);
+// console.log(val);
+  search(val)
 }
 
 function search(form) {
-    console.log(form);
-  var datatable = $('#manage_menu').DataTable({
-    "destroy": true,
-    "processing": false,
-    "responsive": true,
-    "serverSide": true,
-    "ordering": true, // Set true agar bisa di sorting
-    "ajax": {
-        "url": "<?= base_url('Management/Position_c/get/'); ?>", // URL file untuk proses select datanya
-        "type": "POST",
-        "data": form,
-        beforeSend: function() {
-            $("#loader").show();
-        },
-        complete: function() {
-            $("#loader").hide();
-        },
-    },
-    "deferRender": true,
-    "aLengthMenu": [
-        [5, 10, 50],
-        [5, 10, 50]
-    ], // Combobox Limit
-        "columns": [
-            {
-                "data": 'position_id',
-                "sortable": false, // !!! id_sort
-                render: function(data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
-            },
-            {
-                "data": "position_id"
-            },
-            {
-                "data": "position_name"
-            },
-            {
-                data: null,
-                "sortable": false,
-                render: function(data, type, row, meta) {
-                    adds = '<button class="btn btn-primary" value="'+data.position_id+'" onclick="add_modal()" id="add">Add</button>'
-                    views = '<button id="btn-views"  value="'+data.position_id+'" class="btn btn-warning m-3" onclick="view_modal()">View</button>'
-                    return adds + views
+    if (form.direktorat == undefined && form.organisasi == undefined) {
+        console.log(form)
+        var datatable = $('#manage_menu_sec').DataTable({
+            "destroy": true,
+            "processing": false,
+            "responsive": true,
+            "serverSide": true,
+            "ordering": true,  
+            "ajax": {
+                "url": "<?= base_url('Management/Position_c/get_sec/'); ?>", 
+                "type": "POST",
+                "data": form,
+                beforeSend: function() {
+                    $("#loader").show();
                 },
+                complete: function() {
+                    $("#loader").hide();
+                },
+            },
+            "deferRender": true,
+            "aLengthMenu": [
+                [5, 10, 50],
+                [5, 10, 50]
+            ],  
+                "columns": [
+                    {
+                        "data": 'position_id',
+                        "sortable": false,  
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    {
+                        "data": "position_id"
+                    },
+                    {
+                        "data": "position_name"
+                    },
+                    
+                    {
+                        "data": "job_title"
+                    },
+                    
+                    {
+                        "data": "status"
+                    },
+                    {
+                        data: null,
+                        "sortable": false,
+                        render: function(data, type, row, meta) {
+                            adds = '<button class="btn btn-primary" value="'+data.position_id+'" onclick="send_modal()" id="send">Add</button>'
+                            views = '<button id="btn-views"  value="'+data.position_id+'" class="btn btn-warning m-3" onclick="view_modal()">View</button>'
+                            return adds + views
+                        },
 
-            }
-        ],
-  });
+                    }
+                    
+                ],
+        });
+    } else {
+        
+    console.log(form);
+    var datatable = $('#manage_menu').DataTable({
+        "destroy": true,
+        "processing": false,
+        "responsive": true,
+        "serverSide": true,
+        "ordering": true,  
+        "ajax": {
+            "url": "<?= base_url('Management/Position_c/get/'); ?>", 
+            "type": "POST",
+            "data": form,
+            beforeSend: function() {
+                $("#loader").show();
+            },
+            complete: function() {
+                $("#loader").hide();
+            },
+        },
+        "deferRender": true,
+        "aLengthMenu": [
+            [5, 10, 50],
+            [5, 10, 50]
+        ],  
+            "columns": [
+                {
+                    "data": 'position_id',
+                    "sortable": false,  
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
+                {
+                    "data": "position_id"
+                },
+                {
+                    "data": "position_name"
+                },
+                {
+                    data: null,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        adds = '<button class="btn btn-primary" value="'+data.position_id+'" onclick="add_modal()" id="add">Add</button>'
+                        views = '<button id="btn-views"  value="'+data.position_id+'" class="btn btn-warning m-3" onclick="view_modal()">View</button>'
+                        return adds + views
+                    },
+
+                }
+            ],
+    });
+    }
+
 }
 
 function action_submit(data_) {
@@ -164,7 +279,7 @@ function action_submit(data_) {
                 if (data.action == 'ok') {
                     if (action == 'modal_edit') {
                         edit(form);
-                    } else if (action == 'modal_add') {
+                    } else if (action == 'modal_add' || action == 'modal_send') {
                         save(form);
                     } else {
                         delete_(form);
@@ -246,6 +361,51 @@ function add_modal() {
     });
 };
 
+function send_modal() {
+    var val = {};
+    val.modal = 'MODAL SEND LIST JOBS';
+    val.id = 'modal_send';
+    val.form_id = "form_" + val.id;
+    val.position = event.target.value;
+    console.log(val);
+    $.ajax({
+        url: '<?= base_url('Management/Position_c/modal_send/') ?>',
+        type: "post",
+        data: val,
+        success: function(res) {
+            $(".modal_send").html(res);
+            $('#modal_send').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modal_send').modal('show');
+            $('#input-job_function').change(function(){ 
+                // alert('tes');
+                var value = $(this).val();
+                var val = {};
+                val.job_function = value;
+                console.log(val);
+                $.post('<?php echo base_url()?>Management/Position_c/change_job_function',val,function(data){ 
+                    $('.job_sub_function').html(data);
+                });
+            });
+            $('#input-job_family').change(function(){ 
+                // alert('tes');
+                var value = $(this).val();
+                var val = {};
+                val.job_family = value;
+                console.log(val);
+                $.post('<?php echo base_url()?>Management/Position_c/change_job_family',val,function(data){ 
+                    $('.job_sub_family').html(data);
+                });
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('gagal');
+        }
+    });
+};
+
 function save(form) {
     console.log(form);
     Swal.fire({
@@ -277,7 +437,13 @@ function save(form) {
                             location.reload(true);
                         }, 1000);
                     } else {
-                        alert(res)
+                        $('#modal_edit').modal('hide');
+                        Swal.fire({
+                            title: res,
+                            icon: 'error',
+                        });
+
+                       
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {

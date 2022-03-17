@@ -114,6 +114,7 @@ class Level_user_c extends CI_Controller
         $modal = $this->input->post('modal');
         $id = $this->input->post('id');
         $level_user = $this->input->post('level_user');
+        // var_dump($)
         $data['name_level_user'] = $this->User_model->level_user_where($level_user);
         $data['modal_title'] = $modal;
         $data['id'] = $id;
@@ -189,6 +190,7 @@ class Level_user_c extends CI_Controller
         foreach($_POST as $key => $val){
             $data[$key] = $val;
         }
+        // var_dump($data);die;
         // cek kode 
         $cek_kode = $this->training_parameter->where_trms($data[$field],$table,$field)->num_rows();
         if ($cek_kode > 0) {

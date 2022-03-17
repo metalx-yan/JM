@@ -30,7 +30,7 @@
                                     <?php $btn = '<button class="btn btn-success" onclick="edit_modal()" value="' . $row['id'] . '">Edit</button>' ?>
                                     <?= ($access_crud['access_edit'] == '') ? '' : $btn; ?>
 
-                                    <?= ($row['id'] == 2) ? '' : '<button class="btn btn-danger" onclick="delete_modal()" value="' . $row['id'] . '">Delete</button>'; ?>
+                                    <?= ($row['id'] == 100) ? '' : '<button class="btn btn-danger" onclick="delete_modal()" value="' . $row['id'] . '">Delete</button>'; ?>
 
                                 </td>
                             </tr>

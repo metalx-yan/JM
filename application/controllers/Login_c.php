@@ -5,6 +5,9 @@ class Login_c extends CI_Controller {
     public function __construct(){
         parent:: __construct();
         $this->load->model('User_model');
+        $this->load->model('training_parameter');
+        // $this->db_jobmanagement = $this->load->database('db', TRUE);
+
     }
 
     public function index(){
@@ -34,9 +37,20 @@ class Login_c extends CI_Controller {
                     // --> Password verify
                     $this->User_model->update_last_login($get_user['user_name']);
                     $get_user_update = $this->User_model->get_user($get_user['user_name']);
+                    $jabatan = $get_user_update['jabatan'];
+                    // $query = "SELECT user_name,nama from tb_user where approval1 in (select nip from list_superiors) and
+                    // status = 1";
+                    
+                    // $data_puktertinggi = $this->db->query($query)->result_array();
+                    // var_dump($data_puktertinggi);die;
                     // var_dump($get_user_update['last_login']);die;
+                    $access_trms = $this->db->get_where('jrms_user_access',['user_name' => $nip])->row();
+                    if ($access_trms) {
+                        $jabatan = $access_trms->jabatan;
+                    }
                     $data = [
-                        'jabatan' => $get_user_update['jabatan'],
+                        // 'jabatan' => $get_user_update['jabatan'],
+                        'jabatan' => $jabatan,
                         'username' => $nip,
                         'last_login' => $get_user_update['last_login'],
                         'user_logged' => 'login'

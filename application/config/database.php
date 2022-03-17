@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '',
-	'database' => 'db_trms',
+	'hostname' => '10.14.20.211',
+	'username' => 'web_pwa',
+	'password' => 'Webpwa~!@#',
+	'database' => 'db_jrms',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
@@ -141,9 +141,9 @@ $db['training'] = array(
 
 $db['jobmanagement'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '',
+	'hostname' => '10.14.20.211',
+	'username' => 'web_pwa',
+	'password' => 'Webpwa~!@#',
 	'database' => 'db_jobmanagement',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
@@ -160,3 +160,25 @@ $db['jobmanagement'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
+// $db['jobmanagement'] = array(
+// 	'dsn'	=> '',
+// 	'hostname' => 'localhost',
+// 	'username' => 'root',
+// 	'password' => '',
+// 	'database' => 'db_jobmanagement',
+// 	'dbdriver' => 'mysqli',
+// 	'dbprefix' => '',
+// 	'pconnect' => FALSE,
+// 	'db_debug' => (ENVIRONMENT !== 'production'),
+// 	'cache_on' => FALSE,
+// 	'cachedir' => '',
+// 	'char_set' => 'utf8',
+// 	'dbcollat' => 'utf8_general_ci',
+// 	'swap_pre' => '',
+// 	'encrypt' => FALSE,
+// 	'compress' => FALSE,
+// 	'stricton' => FALSE,
+// 	'failover' => array(),
+// 	'save_queries' => TRUE
+// );

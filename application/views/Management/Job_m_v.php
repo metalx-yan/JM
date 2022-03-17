@@ -12,6 +12,9 @@
                         </div>
                     </div>
                 </div>
+                <?php if ($jabatan == '100') {
+                    # code...
+                 ?>
                 <div class="card">
                     <div class="card-header">
                       Search
@@ -76,6 +79,54 @@
                       </table>
                     </div>
                   </div>
+                  <?php } else if($jabatan == '101') {?>
+                    <div class="card">
+                    <div class="card-header">
+                      Job Desc Info
+                    </div>
+                    <form id="form_search">
+
+                      <div class="card-body">
+                            <div class="mb-3 row">
+                              <label class="col-sm-5 col-form-label">Kode Job</label>
+                              <div class="col-sm-7 form-group">
+                              <select onchange="check_v(this)" name="kode" id="input-kode" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                                <!-- <option value="" selected></option>
+                                <?php foreach($direktorat as $direktorat):?>
+                                    <option value="<?= $direktorat['id_dir']?>"><?= $direktorat['dir_group_name']; ?></option>
+                                <?php endforeach; ?> -->
+                              </select>
+                              <span id="error"></span>
+                              </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                              <label class="col-sm-5 col-form-label">Nama Job</label>
+                              <div class="col-sm-7 form-group">
+                              <select onchange="check_v(this)" name="name" id="input-name" class="form-select form-select-sm name" aria-label=".form-select-sm example">
+                                <option value="" selected></option>
+                              </select>
+                              <span id="error"></span>
+                              </div>
+                            </div>
+
+                            <button type="button" data="search" onclick="" class="btn btn-warning float-end" style="margin-left:10px">Send Back</button>
+                            <div></div>
+                            <button type="button" data="search" onclick="" class="btn btn-warning float-end">Approve</button>
+                              <br>
+                      </div>
+                      </form>
+                  </div>
+                  <br>
+                  <div class="card">
+                    <div class="card-header">
+                      Job Desc Detail
+                    </div>
+                    <div class="card-body">
+                      
+                    </div>
+                  </div>
+                <?php } ?>
             </div>
         </div>
     </div>
@@ -140,15 +191,39 @@ function search(form) {
                 data: null,
                 "sortable": false,
                 render: function(data, type, row, meta) {
-                    // adds = '<button class="btn btn-primary" value="'+data.id+'" onclick="add_modal()" id="add">Add</button>'
+                    adds = '<button class="btn btn-primary m-3" value="'+data.id+'" onclick="view_modal()">View</button>'
                     views = '<button id="btn-edits" value="'+data.id+'" class="btn btn-warning m-3" onclick="edit_modal()">Edit</button>'
-                    return views
+                    return adds + views 
                 },
 
             }
         ],
   });
 }
+
+function view_modal() {
+    var val = {};
+    val.modal = 'MODAL VIEW JOB';
+    val.id = 'modal_edit';
+    val.form_id = "form_" + val.id;
+    val.job = event.target.value;
+    val.tujuan = 'tujuan';
+    val.tugas = 'tugas';
+    val.kewenangan = 'kewenangan';
+    val.kompetensi = 'kompetensi';
+    val.kualifikasi = 'kualifikasi';
+    $.ajax({
+        url: '<?= base_url('Management/Job_m_c/view_job/') ?>',
+        type: "get",
+        data: val,
+        success: function(res) {
+            window.location.assign('<?php echo base_url() ?>Management/Job_m_c/view_job/?job=' + val.job + '');
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('gagal');
+        }
+    });
+};
 
 function action_submit(data_) {
     action = $(data_).attr('data');
@@ -357,7 +432,7 @@ function save_multiple(form) {
 
 function edit_modal() {
     var val = {};
-    val.modal = 'MODAL VIEW JOB';
+    val.modal = 'MODAL EDIT JOB';
     val.id = 'modal_edit';
     val.form_id = "form_" + val.id;
     val.position = event.target.value;

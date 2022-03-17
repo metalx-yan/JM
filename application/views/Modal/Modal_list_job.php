@@ -24,11 +24,11 @@
                     <?php foreach($id_job as $list):?>
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-Corporate Funding Head">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-<?= str_replace(' ','',$list['job_title']) ?>" aria-expanded="false" aria-controls="flush-<?= str_replace(' ','',$list['job_title']) ?>">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-<?= str_replace(')','',str_replace('(','',str_replace('&', '',str_replace(' ','',$list['job_title'])))) ?>" aria-expanded="false" aria-controls="flush-<?= str_replace('&', '',str_replace(' ','',$list['job_title'])) ?>">
                                 <?=  $list['job_title'] ?>
                             </button>
                             </h2>
-                            <div id="flush-<?= str_replace(' ','',$list['job_title']) ?>" class="accordion-collapse collapse" aria-labelledby="flush-Corporate Funding Head" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-<?= str_replace(')','',str_replace('(','',str_replace('&', '',str_replace(' ','',$list['job_title'])))) ?>" class="accordion-collapse collapse" aria-labelledby="flush-Corporate Funding Head" data-bs-parent="#accordionFlushExample">
                                 <div class="accordion-body">
                                     <div class="row">
                                         <div class="col-md-6">
@@ -41,7 +41,7 @@
                                             <div class="mb-3 row">
                                                 <label class="col-sm-5 col-form-label">Functional Group : </label>
                                                 <div class="col-sm-7 form-group d-flex align-content-around flex-wrap">
-                                                        <!-- <b><?=  $list['job_title'] ?></b> -->
+                                                        <b><?=  $list['function_group'] ?></b>
                                                 </div>
                                             </div>
                                             <div class="mb-3 row">
@@ -85,6 +85,7 @@
                                             <div class="mb-3 row">
                                                 <label class="col-sm-5 col-form-label">Career Band : </label>
                                                 <div class="col-sm-7 form-group d-flex align-content-around flex-wrap">
+                                                    <b><?=  $list['Grade_Name'] ?></b>
                                                 </div>
                                             </div>
                                         </div>

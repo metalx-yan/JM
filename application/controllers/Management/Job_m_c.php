@@ -29,6 +29,7 @@ class Job_m_c extends CI_Controller {
         $select_organization2 = 'organization_name';
         $select_position1 = 'position_id';
         $select_position2 = 'position_name';
+        $data['jabatan'] = $jabatan;
         $data['navbar_parent'] = navbar_perent($jabatan);
         $data['navbar_child'] = navbar_child($jabatan);
         $data['list_menu'] = $this->db->get('menu')->result_array();
@@ -48,7 +49,7 @@ class Job_m_c extends CI_Controller {
     } 
 
     public function get(){
-        $query = " SELECT distinct a.id,a.position_id, b.position_name,c.id_job,c.job_title from list_jobs a
+        $query = "SELECT distinct a.id,a.position_id, b.position_name,c.id_job,c.job_title from list_jobs a
         join posisi b
         on a.position_id = b.position_id
         join job c
@@ -165,9 +166,81 @@ class Job_m_c extends CI_Controller {
         }else {
             $msg = 'Field Harus di Isi';
         }
-        
 
         echo $msg;
+    }
+
+    function view_job()
+    {
+        $id_job = $this->input->get('job');
+        $table = 'job';
+        $table_posisi = 'posisi';
+        $table_tugas_tanggung_jawab = 'tugas_tanggung_jawab';
+        $table_kewenangan = 'kewenangan';
+        $table_kompetensi = 'kompetensi';
+        $table_listjob = 'list_jobs';
+        $on1 = 'job_name';
+        $on2 = 'id_job';
+        $field_id = 'list_jobs.id';
+        $on3 = 'position_id';
+        
+        $data['data_job'] = $this->training_parameter->join_2_distinct(
+            $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
+            ,$field_id,$id_job,'list_jobs.id,job.id_job,job.job_title,posisi.position_name'
+        )->row();
+
+        $data['tanggung_jawab'] = $this->training_parameter->join($id_job,$table_listjob,'id',$table_tugas_tanggung_jawab,'job_list_id','id','tugas_tanggung_jawab.description')->result_array();
+
+        $data['kewenangan'] = $this->training_parameter->join($id_job,$table_listjob,'id',$table_kewenangan,'job_list_id','id','kewenangan.kewenangan')->result_array();
+
+        $data['kompetensi'] = $this->training_parameter->join($id_job,$table_listjob,'id',$table_kompetensi,'job_list_id','id','kompetensi.kompetensi')->result_array();
+
+        $query_pengalaman_kerja = "SELECT
+        kualifikasi.id, z.description   
+        FROM
+            numbers INNER JOIN kualifikasi
+            ON CHAR_LENGTH(kualifikasi.work_experience)
+            -CHAR_LENGTH(REPLACE(kualifikasi.work_experience, '-', ''))>=numbers.n-1
+            join work_experience z
+            on SUBSTRING_INDEX(SUBSTRING_INDEX(kualifikasi.work_experience, '-', numbers.n), '-', -1) = z.id
+        where kualifikasi.job_list_id = $id_job
+        group by z.id
+        ORDER BY
+            id, n";
+
+        $query = "SELECT distinct a.id id_list_job,c.id_job,c.job_title,b.position_name, d.Discipline_Description,
+        e.job_family,f.job_sub_family,g.job_function,h.job_sub_function
+        from list_jobs a
+        join posisi b
+        on a.position_id = b.position_id
+        join job c
+        on a.job_name = c.id_job
+        join job_discipline d
+        on a.job_discipline = concat(d.Discipline_Code, '-' , d.Discipline_Description)
+        join job_family e
+        on a.job_family = e.id_job_family
+        join job_sub_family f
+        on a.job_sub_family = f.id
+        join job_function g
+        on a.job_function = g.id_job_function
+        join job_sub_function h
+        on a.job_sub_function = h.id
+        where a.id = $id_job";
+        $data['data_profile'] = $this->db_jobmanagement->query($query)->row();
+        $data['pengalaman_kerja'] = $this->db_jobmanagement->query($query_pengalaman_kerja)->result_array();
+        // var_dump($data['pengalaman_kerja']);die;
+
+        $data['title_head'] = 'View Job';
+        $jabatan = $_SESSION['jabatan'];
+        $data['navbar_parent'] = navbar_perent($jabatan);
+        $data['navbar_child'] = navbar_child($jabatan);
+        $data['list_menu'] = $this->db->get('menu')->result_array();
+        $data['access_crud'] = access_crud($this->id);
+
+        $this->load->view('Templates/Header_v',$data);
+        $this->load->view('Templates/Navbar_v',$data);
+        $this->load->view('Job/Job_v',$data);
+        $this->load->view('Templates/Footer_v');
     }
 
     function modal_edit()
@@ -201,6 +274,8 @@ class Job_m_c extends CI_Controller {
         $kompetensi = $this->input->post('kompetensi');
         $kpi = $this->input->post('kpi');
         $kualifikasi = $this->input->post('kualifikasi');
+        $kode_job_function = 'Y';
+        $field_job_function = 'flagactive';
         
         $data['id_job'] = $this->training_parameter->join_2_distinct(
             $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
@@ -229,8 +304,8 @@ class Job_m_c extends CI_Controller {
             $table_tugas_tanggung_jawab,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'tugas_tanggung_jawab.description,list_jobs.id'
             )->result_array();
 
-        $data['job_family'] = $this->training_parameter->get_($table_jobfamily)->result_array();
-        
+        $data['job_family'] = $this->training_parameter->where_groupby_job_function($kode_job_function,$table_jobfamily,$field_job_function)->result_array();
+
         $data['job_category'] = $this->training_parameter->get_($table_category)->result_array();
 
         $query_tugas = "SELECT a.id id_list_job , c.id_job_family, c.job_family, d.id id_job_cateogory, d.job_category from list_jobs a

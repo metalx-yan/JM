@@ -78,6 +78,11 @@ class training_parameter extends CI_Model {
         return $this->db_jobmanagement->distinct()->select("$select1,$select2")->get_where($table,[$field=>$kode]);
     }
 
+    function where_distinct_not_null_single_where($kode,$table,$select1,$select2){
+        $this->db_jobmanagement->where($kode);
+        return $this->db_jobmanagement->distinct()->select("$select1,$select2")->get($table);
+    }
+
     function where_groupby_job_function($kode,$table,$field){
         $this->db_jobmanagement->group_by($table); 
         return $this->db_jobmanagement->get_where($table,[$field=>$kode]);
@@ -124,6 +129,16 @@ class training_parameter extends CI_Model {
         $save = $this->db_jobmanagement->insert($table,$data);
         if ($save) {
             return true;
+        }else{
+            return false;
+        }
+    }
+
+    function save_send($data,$table){
+        $save = $this->db_jobmanagement->insert($table,$data);
+        $get_id = $this->db_jobmanagement->insert_id();
+        if ($save) {
+            return $get_id;
         }else{
             return false;
         }
@@ -190,6 +205,12 @@ class training_parameter extends CI_Model {
         return $this->db_jobmanagement->get($table);
     }
 
+    function get_select_distinct($table,$select1,$select2){
+        $this->db_jobmanagement->distinct()->select("$select1,$select2");
+        $this->db_jobmanagement->order_by($select2, "asc");
+        return $this->db_jobmanagement->get($table);
+    }
+
     function get_distinct($table){
         return $this->db_jobmanagement->distinct()->where( 'discipline_description !=', '')->get($table);
     }
@@ -213,6 +234,13 @@ class training_parameter extends CI_Model {
         $this->db_jobmanagement->join($table2,"$table1.$on_join1 = $table2.$on_join2");
         $this->db_jobmanagement->where($field1,$record1);
         return $this->db_jobmanagement->get($table1);
+    }
+
+    function join($kode,$table,$field,$join,$on_join,$on_join2,$select){
+        $this->db_jobmanagement->select("$select");
+        $this->db_jobmanagement->join($join,"$join.$on_join = $table.$on_join2");
+        $this->db_jobmanagement->where($table.'.'.$field,$kode);
+        return $this->db_jobmanagement->get($table);
     }
 
     function join_($kode,$table,$field,$join,$on_join){
