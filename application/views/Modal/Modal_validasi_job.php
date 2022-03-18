@@ -9,6 +9,11 @@
         <div class="mb-3 row">
           <div class="col-sm-7 form-group">
             <input type="hidden" id="input-id_job" onkeyup="key(this)" value="<?php echo (($id_job) ? $id_job->id : '') ?>" name="id" class="form-control" required <?php echo (($id == 'modal_edit' || $id == 'modal_delete') ? 'readonly' : '') ?>>
+            <input type="hidden" name="status" value="0">
+            <input type="hidden" name="user_name" value="<?= $username_login ?>">
+            <input type="hidden" name="form_" value="">
+            <input type="hidden" name="before_id" value="<?= $id_job->id ?>">
+
             <div id="error"></div>
           </div>
         </div>
@@ -110,7 +115,7 @@
             <div class="mb-3 row">
               <label class="col-sm-5 col-form-label">Purpose</label>
               <div class="col-sm-7 form-group">
-              <textarea name="purpose" id="" cols="30" rows="4" class="form-control" style="resize: none;"><?= $id_job->purpose?></textarea>
+              <textarea name="purpose" cols="30" rows="4" class="form-control" style="resize: none;"><?= $id_job->purpose ?></textarea>
               <span id="error"></span>
               </div>
             </div>
@@ -132,9 +137,13 @@
         </div>
         </div>
         <div class="modal-footer">
-          <!-- <button type="button" data="<?= $id ?>" onclick="close_modal(this)" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
-          <button type="button" data="save" onclick="action_submit(this)" class="btn btn-primary">Save</button>
-          <button type="button" data="approve" onclick="action_submit(this)" class="btn btn-primary">Approve</button>
+            <?php if ($id_job->status_job == 1) {  ?>
+          <button type="button"  class="btn btn-success" style="cursor: default;">Approve</button>
+            <?php } else { ?>
+          <button type="button" data="<?= $id ?>" onclick="action_submit(this)" class="btn btn-primary">Save</button>
+          <button type="button" data="<?= $approve ?>" onclick="action_submit(this)" class="btn btn-primary">Approve</button>
+            <?php } ?>
+        
         </div>
       </form>
     </div>

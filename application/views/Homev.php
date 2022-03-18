@@ -227,8 +227,13 @@
                     data: null,
                     "sortable": false,
                     render: function(data, type, row, meta) {
+                      if (data.role == '100') {
                         views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="view_modal()">View</button>'
                         return views
+                      } else {
+                        views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="">View</button>'
+                        return views
+                      }
                     },
 
                 }
@@ -237,11 +242,16 @@
             ],
     });
   })
+    function close_modal(data_) {
+        action = $(data_).attr('data');
+        $("#" + action).remove();
+    }
 
     function view_modal() {
         var val = {};
         val.modal = 'MODAL VIEW JOB';
         val.id = 'modal_view';
+        val.approve = 'modal_approve';
         val.form_id = "form_" + val.id;
         val.job = event.target.value;
         console.log(val);
@@ -266,21 +276,23 @@
     function action_submit(data_) {
       action = $(data_).attr('data');
       $('#error').html(" ");
-      form = $(action).serialize();
-      console.log(form)
+      form = $("#form_" + 'modal_view').serialize();
+      console.log(action)
     
         $.ajax({
             type: "POST",
-            url: "<?php echo site_url('Management/Position_c/validate'); ?>",
+            url: "<?php echo site_url('/Home_c/validate'); ?>",
             data: form,
             dataType: "json",
             success: function(data) {
-                
+                console.log(data);
                 if (data.action == 'ok') {
-                    if (action == 'save') {
+                    if (action == 'modal_view') {
                         save(form);
                     } else {
-                        approve(form);
+                      approve(form);
+
+                        // approve(form);
                     }
                 } else {
                     $.each(data, function(key, value) {
@@ -297,6 +309,102 @@
 
             }
         });
+  }
+
+  function save(form) {
+      console.log(form);
+      Swal.fire({
+          title: 'Do you want to save the changes?',
+          showDenyButton: true,
+          confirmButtonText: 'Save',
+          denyButtonText: `Cancel`,
+      }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
+                  url: '<?= base_url('/Home_c/save/') ?>',
+                  type: "post",
+                  data: form,
+                  beforeSend: function() {
+                      $("#loader").show();
+                  },
+                  complete: function() {
+                      $("#loader").hide();
+                  },
+                  success: function(res) {
+                      if (res == 'Berhasil di Simpan') {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: 'Your has been saved.',
+                              icon: 'success',
+                          });
+
+                          setTimeout(function() {
+                              location.reload(true);
+                          }, 1000);
+                      } else {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: res,
+                              icon: 'error',
+                          });
+
+                        
+                      }
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) {
+                      alert('gagal');
+                  }
+              });
+          }
+      })
+  }
+
+  function approve(form) {
+      console.log(form);
+      Swal.fire({
+          title: 'Do you want to save the changes?',
+          showDenyButton: true,
+          confirmButtonText: 'Save',
+          denyButtonText: `Cancel`,
+      }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
+                  url: '<?= base_url('/Home_c/approve/') ?>',
+                  type: "post",
+                  data: form,
+                  beforeSend: function() {
+                      $("#loader").show();
+                  },
+                  complete: function() {
+                      $("#loader").hide();
+                  },
+                  success: function(res) {
+                      if (res == 'Berhasil di Simpan') {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: 'Your has been saved.',
+                              icon: 'success',
+                          });
+
+                          setTimeout(function() {
+                              location.reload(true);
+                          }, 1000);
+                      } else {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: res,
+                              icon: 'error',
+                          });
+
+                        
+                      }
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) {
+                      alert('gagal');
+                  }
+              });
+          }
+      })
   }
 
     // var data2 = {

@@ -120,7 +120,7 @@ class Position_c extends CI_Controller {
         on a.job_name = c.id_job
         left join status_job d
         on a.id = d.job_list_id 
-        where position_name in (select distinct position_name from posisi where org_group = '$data_singkatan->singkatan') $where";
+        where position_name in (select distinct position_name from posisi where org_group = '$data_singkatan->singkatan') and a.id = d.job_list_id $where";
 
         $data = $this->db_jobmanagement->query($query)->result_array();
         $counts  = $this->db_jobmanagement->query($query)->num_rows();
@@ -365,21 +365,21 @@ class Position_c extends CI_Controller {
             );
         }
 
-        if ($cek_job_name < 0) {
+        if ($cek_job_name <= 0) {
             $this->training_parameter->save($data_job_name,$table_job);
             $msg = 'create';
         }else{
             $msg = 'no';
 
         }
+        // var_dump($msg,$cek_job_name);die;
 
         $cek = $this->training_parameter->where_double($table,'position_id','job_name',$data['position_id'],$data['job_name'])->num_rows();
-        // var_dump($cek);die;
         
         // cek kode 
         // var_dump($data['position_id'], $data['job_name'],$cek,$data['status']);die;
         if($cek > 0) {
-            $msg = 'Job tidak boleh sama';
+            $msg = 'Job tidak boleh sama dalam 1 posisi';
 
         } else {
 
@@ -403,64 +403,8 @@ class Position_c extends CI_Controller {
                         'status' => $data['status'],
                         'user_name' => $data['user_name'],
                     );
-                    $save = $this->training_parameter->save_send($data_create_job,$table);
+                    $save = $this->training_parameter->save($data_create_job,$table); 
                     
-                } else {
-                    $data_create_job_sec = array(
-                        'job_name' => $data['job_name'],
-                        'function_group' => $data['function_group'],
-                        'job_function' => $data['job_function'],
-                        'job_sub_function' => $data['job_sub_function'],
-                        'job_family' => $data['job_family'],
-                        'job_sub_family' => $data['job_sub_family'],
-                        'job_discipline' => $data['job_discipline'],
-                        'purpose' => $data['purpose'],
-                        'career_band' => $data['career_band'],
-                        // 'career_level' => $data['career_level'],
-                        // 'grade' => $data['grade'],
-                        'created_at' => $data['created_at'],
-                        'position_id' => $data['position_id'],
-                        'status' => $data['status'],
-                        'user_name' => $data['user_name'],
-                    );
-                    $save = $this->training_parameter->save_send($data_create_job_sec,$table);
-                    
-                }
-                // var_dump($save);die;
-                $data_create_status_job = array(
-                    'job_list_id' => $save,
-                    'status' => 0,
-                    'created_at' => $data['created_at']
-                );
-                $save = $this->training_parameter->save($data_create_status_job,'status_job'); 
-
-                if ($save == true) {
-                    $msg = 'Berhasil di Simpan';
-                }else{
-                    $msg = 'Gagal Menyimpan';
-                }
-            } else {
-                # code...
-            
-                if ($data_job_name['job_title'] == $data['job_name']) {
-                    $data_create_job = array(
-                        'job_name' => $data_job_name['id_job'],
-                        'function_group' => $data['function_group'],
-                        'job_function' => $data['job_function'],
-                        'job_sub_function' => $data['job_sub_function'],
-                        'job_family' => $data['job_family'],
-                        'job_sub_family' => $data['job_sub_family'],
-                        'job_discipline' => $data['job_discipline'],
-                        'purpose' => $data['purpose'],
-                        'career_band' => $data['career_band'],
-                        // 'career_level' => $data['career_level'],
-                        // 'grade' => $data['grade'],
-                        'created_at' => $data['created_at'],
-                        'position_id' => $data['position_id'],
-                        'status' => $data['status'],
-                        'user_name' => $data['user_name'],
-                    );
-                    $save = $this->training_parameter->save($data_create_job,$table);
                     if ($save == true) {
                         $msg = 'Berhasil di Simpan';
                     }else{
@@ -490,7 +434,81 @@ class Position_c extends CI_Controller {
                     }else{
                         $msg = 'Gagal Menyimpan';
                     }
+              
                 }
+
+            } else {
+                # code...
+            
+                if ($data_job_name['job_title'] == $data['job_name']) {
+                    $data_create_job = array(
+                        'job_name' => $data_job_name['id_job'],
+                        'function_group' => $data['function_group'],
+                        'job_function' => $data['job_function'],
+                        'job_sub_function' => $data['job_sub_function'],
+                        'job_family' => $data['job_family'],
+                        'job_sub_family' => $data['job_sub_family'],
+                        'job_discipline' => $data['job_discipline'],
+                        'purpose' => $data['purpose'],
+                        'career_band' => $data['career_band'],
+                        // 'career_level' => $data['career_level'],
+                        // 'grade' => $data['grade'],
+                        'created_at' => $data['created_at'],
+                        'position_id' => $data['position_id'],
+                        'status' => $data['status'],
+                        'user_name' => $data['user_name'],
+                    );
+                 
+                    $save = $this->training_parameter->save_send($data_create_job,$table);
+
+               
+
+                    $data_create_status_job = array(
+                        'job_list_id' => $save,
+                        'status' => 0,
+                        'created_at' => $data['created_at']
+                    );
+                    $save = $this->training_parameter->save($data_create_status_job,'status_job'); 
+                    
+                    if ($save == true) {
+                        $msg = 'Berhasil di Simpan';
+                    }else{
+                        $msg = 'Gagal Menyimpan';
+                    }
+                } else {
+                    $data_create_job_sec = array(
+                        'job_name' => $data['job_name'],
+                        'function_group' => $data['function_group'],
+                        'job_function' => $data['job_function'],
+                        'job_sub_function' => $data['job_sub_function'],
+                        'job_family' => $data['job_family'],
+                        'job_sub_family' => $data['job_sub_family'],
+                        'job_discipline' => $data['job_discipline'],
+                        'purpose' => $data['purpose'],
+                        'career_band' => $data['career_band'],
+                        // 'career_level' => $data['career_level'],
+                        // 'grade' => $data['grade'],
+                        'created_at' => $data['created_at'],
+                        'position_id' => $data['position_id'],
+                        'status' => $data['status'],
+                        'user_name' => $data['user_name'],
+                    );
+                    $save = $this->training_parameter->save_send($data_create_job_sec,$table);
+
+                    $data_create_status_job = array(
+                        'job_list_id' => $save,
+                        'status' => 0,
+                        'created_at' => $data['created_at']
+                    );
+                    $save = $this->training_parameter->save($data_create_status_job,'status_job'); 
+                    
+                    if ($save == true) {
+                        $msg = 'Berhasil di Simpan';
+                    }else{
+                        $msg = 'Gagal Menyimpan';
+                    }
+                }
+
             }
 
         }

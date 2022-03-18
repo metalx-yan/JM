@@ -77,7 +77,7 @@ class Job_m_c extends CI_Controller {
         $where = $params;
         // $where  = array('nama_kategori' => 'Tutorial');
         // jika memakai IS NULL pada where sql
-        $isWhere = null;
+        $isWhere = 'a.verify_validasi IS NULL';
         // $isWhere = 'artikel.deleted_at IS NULL';
       
         header('Content-Type: application/json');

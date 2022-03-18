@@ -12,7 +12,7 @@
             <input type="hidden" id="input-id_position" onkeyup="key(this)" value="<?php echo (($position) ? $position->position_id : '') ?>" name="position_id" class="form-control" required <?php echo (($id == 'modal_edit' || $id == 'modal_delete') ? 'readonly' : '') ?>>
             <input type="hidden" name="status" value="0">
             <input type="hidden" name="user_name" value="<?= $username_login ?>">
-            <input type="hidden" name="form_" value="">
+            <input type="hidden" name="form_" value="send">
 
             <div id="error"></div>
           </div>
