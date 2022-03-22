@@ -36,7 +36,9 @@
             </div>
             <div class="col-md-4"></div>
           </div>
-         
+          <p><span class="badge rounded-pill " style="background-color: #f26a44;">&nbsp;</span> <b style="font-size: 14px;">On Progress</b></p> 
+          <p><span class="badge rounded-pill " style="background-color: #f2d544;">&nbsp;</span> <b style="font-size: 14px;">Validasi Job (Admin)</b></p>
+          <p><span class="badge rounded-pill " style="background-color: #3fd467;">&nbsp;</span> <b style="font-size: 14px;">Validasi Job Profile (Admin)</b></p>
           <table id="manage_menu" class="table table-bordered table-striped text-center align-middle" width="100%">
             <thead>
                 <tr class="text-center">
@@ -53,6 +55,7 @@
     </div>
   </div>
   <div class="modal_view"></div>
+  <div class="modal_review"></div>
   </section>
 
   <script>
@@ -187,6 +190,14 @@
       // }
 
       var datatable = $('#manage_menu').DataTable({
+        rowCallback: function(row, data, index){
+          if(data.status == '1'){
+            $(row).find('td:eq(0)').css('background-color', '#f2d544').css('color', 'white');
+          }
+          if(data.status == '0'){
+            $(row).find('td:eq(0)').css('background-color', '#f26a44').css('color', 'white');
+          }
+        },
         "destroy": true,
         "processing": false,
         "responsive": true,
@@ -212,7 +223,7 @@
         "columns": [
            
                 {
-                    "data": "position_id"
+                    "data": "job_name"
                 },
                 {
                     "data": "job_title"
@@ -231,7 +242,7 @@
                         views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="view_modal()">View</button>'
                         return views
                       } else {
-                        views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="">View</button>'
+                        views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="review_modal()">View</button>'
                         return views
                       }
                     },
@@ -310,6 +321,51 @@
             }
         });
   }
+
+  function review_modal() {
+    var val = {};
+    val.modal = 'MODAL REVIEW JOB';
+    val.id = 'modal_review';
+    val.form_id = "form_" + val.id;
+    val.position = event.target.value;
+    // console.log(val.position)
+    val.tujuan = 'tujuan';
+    val.tugas = 'tugas';
+    val.kewenangan = 'kewenangan';
+    val.kompetensi = 'kompetensi';
+    val.kualifikasi = 'kualifikasi';
+    val.kpi = 'kpi';
+    $.ajax({
+        url: '<?= base_url('Home_c/modal_review/') ?>',
+        type: "post",
+        data: val,
+        success: function(res) {
+
+            $(".modal_review").html(res);
+            $('#modal_review').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modal_review').modal('show');
+            
+            $('#input-tingkat_pendidikan').change(function(){ 
+                // alert('tes');
+                // var value = $(this).val();
+                var value = $('#input-tingkat_pendidikan option:selected').text();
+                var val = {};
+                val.tingkat_pendidikan = value;
+                console.log(value)
+                $.post('<?php echo base_url()?>Management/Job_m_c/change_jurusan',val,function(data){ 
+                console.log(data);
+                    $('.jurusan').html(data);
+                });
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('gagal');
+        }
+    });
+};
 
   function save(form) {
       console.log(form);

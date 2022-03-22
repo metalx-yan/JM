@@ -35,12 +35,12 @@ class Home_c extends CI_Controller
     public function get()
     {
         $jabatan = $_SESSION['jabatan'];
-        
+        // var_dump($jabatan);die;
 
-        if ($jabatan == 100) {
+        if ($jabatan == '100') {
             # code...
             // , CASE WHEN b.status = 0 THEN 'Belum Ada' WHEN b.status = 1 THEN 'Admin' END status_job 
-            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan, $jabatan as role
+            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan,b.status, $jabatan as role
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -52,7 +52,9 @@ class Home_c extends CI_Controller
             on a.user_name = e.user_name
             left join status_job b
             on a.id = b.job_list_id
-            where a.id = b.job_list_id";
+            left join status_job_profile z
+            on a.id = b.job_list_id
+            where a.id = b.job_list_id and e.jabatan != '100' and d.status ='1'";
 
             $data = $this->db_jobmanagement->query($query)->result_array();
             $counts  = $this->db_jobmanagement->query($query)->num_rows();
@@ -68,7 +70,7 @@ class Home_c extends CI_Controller
             header('Content-Type: application/json');
             echo json_encode($callback); // Convert array $callback ke json
 
-        } else if ($jabatan == 101) {
+        } else if ($jabatan == '101') {
             
             $username = $_SESSION['username'];
             $get_branch = "SELECT distinct job_title,branch from tb_user where approval1 in (SELECT nip from list_superiors) and
@@ -76,7 +78,7 @@ class Home_c extends CI_Controller
             $data_branch = $this->db->query($get_branch)->row();
             $get_singkatan = "SELECT distinct singkatan from branch where id_branch = '$data_branch->branch'";
             $data_singkatan = $this->db->query($get_singkatan)->row();
-            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan, $jabatan as role
+            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,b.nama,e.jabatan,b.status
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -85,10 +87,14 @@ class Home_c extends CI_Controller
             inner join db_jrms.tb_user d
             on a.user_name = d.user_name
             inner join db_jrms.jrms_user_access e
-            on a.user_name = e.user_name
-            left join status_job b
+            on a.user_name = e.user_name						
+            left join (select x.id,z.nama,x.status,x.job_list_id,z.status status_aktif from status_job x
+            join db_jrms.tb_user z
+            on x.approved_by = z.user_name
+            left join status_job_profile k
+            on z.user_name = k.approved_by)  b
             on a.id = b.job_list_id
-            where position_name in (select distinct position_name from posisi where org_group = '$data_singkatan->singkatan') and a.id = b.job_list_id";
+            where position_name in (select distinct position_name from posisi where org_group = '$data_singkatan->singkatan') and b.status = 1 and b.status_aktif = 1";
 
             $data = $this->db_jobmanagement->query($query)->result_array();
             $counts  = $this->db_jobmanagement->query($query)->num_rows();
@@ -105,8 +111,6 @@ class Home_c extends CI_Controller
         }
 
     }
-
-   
 
     function modal_view()
     {
@@ -127,19 +131,19 @@ class Home_c extends CI_Controller
         $field_job_discipline = 'Discipline_Description';
        
         $query = "SELECT distinct a.id,b.id_job,b.job_title,c.id_job_function,c.job_function,d.id_job_family,d.job_family,e.id as id_job_sub_function,e.job_sub_function,f.id as id_job_sub_family,f.job_sub_family,g.Discipline_Description,g.Discipline_Code,z.id_job_level,z.Grade_Name,a.function_group,a.purpose,j.status status_job from list_jobs a
-        join job b
+        inner join job b
         on a.job_name = b.id_job
-        join job_function c
+        inner join job_function c
         on a.job_function = c.id_job_function
-        join job_family d
+        inner join job_family d
         on a.job_family = d.id_job_family
-        join job_sub_function e
+        inner join job_sub_function e
         on a.job_sub_function = e.id
-        join job_sub_family f
+        inner join job_sub_family f
         on a.job_sub_family = f.id
-        join job_discipline g
+        inner join job_discipline g
         on a.job_discipline = concat(g.Discipline_Code,'-',g.Discipline_Description)
-        join job_level z
+        inner join job_level z
         on a.career_band = z.id_job_level
         inner join db_jrms.tb_user h
         on a.user_name = h.user_name
@@ -168,12 +172,128 @@ class Home_c extends CI_Controller
         echo $html_modal;
     }
 
+    function modal_review()
+    {
+        $table = 'job';
+        $table_posisi = 'posisi';
+        $table_listjob = 'list_jobs';
+        $table_tujuan_jabatan = 'tujuan_jabatan';
+        $table_kewenangan = 'kewenangan';
+        $table_kompetensi = 'kompetensi';
+        $table_kpi = 'kpi';
+        $table_kualifikasi = 'kualifikasi';
+        $table_workexperience = 'work_experience';
+        $table_tingkatpendidikan = 'edu_lvl';
+        $table_jobfamily = 'job_family';
+        $table_tugas_tanggung_jawab = 'tugas_tanggung_jawab';
+        $table_category = 'job_category';
+        $on1 = 'job_name';
+        $on2 = 'id_job';
+        $field_id = 'list_jobs.id';
+        $on3 = 'position_id';
+        $on4 = 'job_list_id';
+        $on5 = 'id';
+        $field_hide = 'hide';
+        $modal = $this->input->post('modal');
+        $position_id = $this->input->post('position');
+        $id = $this->input->post('id');
+        $tujuan = $this->input->post('tujuan');
+        $tugas = $this->input->post('tugas');
+        $kewenangan = $this->input->post('kewenangan');
+        $kompetensi = $this->input->post('kompetensi');
+        $kpi = $this->input->post('kpi');
+        $kualifikasi = $this->input->post('kualifikasi');
+        $kode_job_function = 'Y';
+        $field_job_function = 'flagactive';
+        
+        $data['id_job'] = $this->training_parameter->join_2_distinct(
+            $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
+            ,$field_id,$position_id,'list_jobs.id,job.id_job,job.job_title,posisi.position_name'
+        )->row();
+        $data['work_experience'] = $this->training_parameter->get_($table_workexperience)->result_array();
+        $data['tingkat_pendidikan'] = $this->training_parameter->where_null($table_tingkatpendidikan,$field_hide,'id,edu_name')->result_array();
+
+        $data['tujuan_id'] = $this->training_parameter->join_distinct(
+           $table_tujuan_jabatan,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'tujuan_jabatan.id id_tujuan_jabatan,tujuan_jabatan.tujuan,list_jobs.id'
+        )->row();
+        
+        $data['kewenangan_id'] = $this->training_parameter->join_distinct(
+            $table_kewenangan,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kewenangan.id id_kewenangan,kewenangan.kewenangan,list_jobs.id'
+         )->result_array();
+
+        $data['kompetensi_id'] = $this->training_parameter->join_distinct(
+            $table_kompetensi,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kompetensi.id id_kompetensi,kompetensi.kompetensi,list_jobs.id'
+            )->result_array();
+
+        $data['kpi_id'] = $this->training_parameter->join_distinct(
+            $table_kpi,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kpi.id id_kpi,kpi.kpi,list_jobs.id'
+            )->result_array();
+        
+        $data['desc_tugas_tanggung_jawab_id'] = $this->training_parameter->join_distinct(
+            $table_tugas_tanggung_jawab,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'tugas_tanggung_jawab.description,list_jobs.id'
+            )->result_array();
+
+        $data['job_family'] = $this->training_parameter->where_groupby_job_function($kode_job_function,$table_jobfamily,$field_job_function)->result_array();
+
+        $data['job_category'] = $this->training_parameter->get_($table_category)->result_array();
+
+        $query_tugas = "SELECT a.id id_list_job , c.id_job_family, c.job_family, d.id id_job_cateogory, d.job_category from list_jobs a
+        join tugas_tanggung_jawab b
+        on a.id = b.job_list_id
+        join job_family c
+        on b.job_family = c.id_job_family
+        join job_category d
+        on b.job_category = d.id
+        where b.job_list_id = $position_id";
+
+        $query = "SELECT a.id id_kualifikasi,a.persyaratan_khusus, b.id id_tingkat_pendidikan, b.edu_name, c.id id_jurusan, c.edu_mjr,a.work_experience from kualifikasi a
+        join edu_lvl b
+        on a.tingkat_pendidikan = b.id
+        join edu_mjr c
+        on a.jurusan = c.id
+        where a.job_list_id = $position_id ";
+
+        $data['tugas_tanggung_jawab_id'] = $this->db_jobmanagement->query($query_tugas)->row();
+
+        $data['kualifikasi_id'] = $this->db_jobmanagement->query($query)->result_array();
+
+        $data_kualifikasi = '';
+        foreach ($data['kualifikasi_id'] as $key => $value) {
+            $data_kualifikasi = explode('-',$value['work_experience']);
+        }
+        
+        if ($data_kualifikasi == '') {
+            $data_kual = array();
+        } else {
+            $data_kual = $data_kualifikasi;
+        }
+
+        $data['data_description'] = $data_kual;
+        
+        // var_dump($data['data_description']);die;
+
+        $data['modal_title'] = $modal;
+        $data['id'] = $id;
+        $data['tujuan'] = $tujuan;
+        $data['tugas'] = $tugas;
+        $data['kewenangan'] = $kewenangan;
+        $data['kompetensi'] = $kompetensi;
+        $data['kpi'] = $kpi;
+        $data['kualifikasi'] = $kualifikasi;
+        $html_modal = $this->load->view('Modal/Modal_review_job',$data,TRUE);
+        echo $html_modal;
+    }
+
     function approve() {
+        $get_nip = $_SESSION['username'];
         foreach($_POST as $key => $val){
             $data[$key] = $val;
         }
         $status_job_change = ['status' => 1];
-        $save = $this->training_parameter->update($data['id'],$status_job_change,'status_job','job_list_id'); 
+        $this->training_parameter->update($data['id'],$status_job_change,'status_job','job_list_id'); 
+
+        $status_approved = ['approved_by' => $get_nip];
+        $save = $this->training_parameter->update($data['id'],$status_approved,'status_job','job_list_id'); 
 
         if ($save == true) {
 
@@ -196,47 +316,53 @@ class Home_c extends CI_Controller
         foreach($_POST as $key => $val){
             $data[$key] = $val;
         }
+        // var_dump($data);die;
         $this->now;
         $now = date('Y-m-d H:i:s'); 
         $data['created_at'] = $now;
         $cek_job_name = $this->training_parameter->where($data[$record_job_title],$table_job,$field_job_id)->num_rows();
         
         $extract = explode('.',$data['job_name']);
-        if (count($extract) == 1) {
-            $num_add = '';
-            $max = 'max(created_at) created_at';
-            $get_max_id = $this->training_parameter->get_select_max($table_job,$max)->row();
-            $cek_id_job = $this->training_parameter->where($get_max_id->created_at,$table_job,'created_at')->row();
-
-            if (is_null($get_max_id->created_at)) {
-                $data_job_name = array(
-                    'id_job' => 1,
-                    'job_title' => $data['job_name'],
-                    'created_at' => $data['created_at']
-                );
-            } else {
-                $data_job_name = array(
-                    'id_job' => $cek_id_job->id_job+1,
-                    'job_title' => $data['job_name'],
-                    'created_at' => $data['created_at']
-                );
-            }
-            
-        } else {
-            if (strlen($extract[2]+1) == 1) {
-                $num_add = '00';
-            } else if (strlen($extract[2]+1) == 2) {
-                $num_add = '0';
-            } else {
+        if ($cek_job_name <= 0) {
+            if (count($extract) == 1) {
                 $num_add = '';
-            }
-            
-            $get_job_name = $this->training_parameter->where($data[$record_job_title],$table_job,'id_job')->row();
+                $max = 'max(created_at) created_at';
+                $get_max_id = $this->training_parameter->get_select_max($table_job,$max)->row();
+                $cek_id_job = $this->training_parameter->where($get_max_id->created_at,$table_job,'created_at')->row();
     
-            $data_job_name = array(
-                'id_job' => $extract[0].'.'.$extract[1].'.'.$num_add.''.strval($extract[2]+1),
-                'job_title' => $get_job_name->job_title,
-            );
+                if (is_null($get_max_id->created_at)) {
+                    $data_job_name = array(
+                        'id_job' => 1,
+                        'job_title' => $data['job_name'],
+                        'created_at' => $data['created_at']
+                    );
+                } else {
+                    $data_job_name = array(
+                        'id_job' => $cek_id_job->id_job+1,
+                        'job_title' => $data['job_name'],
+                        'created_at' => $data['created_at']
+                    );
+                }
+                
+            } else {
+                if (strlen($extract[2]+1) == 1) {
+                    $num_add = '00';
+                } else if (strlen($extract[2]+1) == 2) {
+                    $num_add = '0';
+                } else {
+                    $num_add = '';
+                }
+                
+                $get_job_name = $this->training_parameter->where($data[$record_job_title],$table_job,'id_job')->row();
+        
+                $data_job_name = array(
+                    'id_job' => $extract[0].'.'.$extract[1].'.'.$num_add.''.strval($extract[2]+1),
+                    'job_title' => $get_job_name->job_title,
+                );
+            }
+        } else {
+            $data_job_name = ['id_job' => $data['job_name']];
+
         }
 
         if ($cek_job_name <= 0) {
@@ -246,6 +372,8 @@ class Home_c extends CI_Controller
             $msg = 'no';
 
         }
+        // var_dump($data['job_name'],$data_job_name['id_job']);die;
+
 
         $get_before_id = $this->training_parameter->where($data['before_id'],$table,'id')->row();
 
@@ -257,7 +385,7 @@ class Home_c extends CI_Controller
         // } else {
             // $get_before_id = $this->training_parameter->where($data['before_id'],$table,'id')->row();
         //    var_dump($data);die;
-            if ($data_job_name['job_title'] == $data['job_name']) {
+            if ($data_job_name['id_job'] == $data['job_name']) {
                     $data_create_job = array(
                         'job_name' => $data_job_name['id_job'],
                         'function_group' => $data['function_group'],
@@ -294,10 +422,9 @@ class Home_c extends CI_Controller
                         $msg = 'Gagal Menyimpan';
                     }
             } else {
-                // $get_before_id = $this->training_parameter->where($data['before_id'],$table,'id')->row();
 
                 $data_create_job_sec = array(
-                    'job_name' => $data['job_name'],
+                    'job_name' => $data_job_name['id_job'],
                     'function_group' => $data['function_group'],
                     'job_function' => $data['job_function'],
                     'job_sub_function' => $data['job_sub_function'],
@@ -331,9 +458,6 @@ class Home_c extends CI_Controller
                 }else{
                     $msg = 'Gagal Menyimpan';
                 }
-               
-            // }
-
 
         }
         

@@ -300,7 +300,7 @@ class Position_c extends CI_Controller {
         on a.job_discipline = concat(g.Discipline_Code,'-',g.Discipline_Description)
         left join job_level h
         on a.career_band = h.id_job_level
-        where a.position_id = '$position_id'";
+        where a.position_id = '$position_id' and a.verify_validasi is null";
 
         $data['id_job'] = $this->db_jobmanagement->query($query)->result_array();
         // var_dump($data['id_job']);die;
@@ -323,47 +323,55 @@ class Position_c extends CI_Controller {
             $data[$key] = $val;
         }
         $this->now;
+        // var_dump($data);die;
         $now = date('Y-m-d H:i:s'); 
         $data['created_at'] = $now;
         $cek_job_name = $this->training_parameter->where($data[$record_job_title],$table_job,$field_job_id)->num_rows();
         
         $extract = explode('.',$data['job_name']);
-        if (count($extract) == 1) {
-            $num_add = '';
-            $max = 'max(created_at) created_at';
-            $get_max_id = $this->training_parameter->get_select_max($table_job,$max)->row();
-            $cek_id_job = $this->training_parameter->where($get_max_id->created_at,$table_job,'created_at')->row();
-
-            if (is_null($get_max_id->created_at)) {
-                $data_job_name = array(
-                    'id_job' => 1,
-                    'job_title' => $data['job_name'],
-                    'created_at' => $data['created_at']
-                );
-            } else {
-                $data_job_name = array(
-                    'id_job' => $cek_id_job->id_job+1,
-                    'job_title' => $data['job_name'],
-                    'created_at' => $data['created_at']
-                );
-            }
-            
-        } else {
-            if (strlen($extract[2]+1) == 1) {
-                $num_add = '00';
-            } else if (strlen($extract[2]+1) == 2) {
-                $num_add = '0';
-            } else {
+        if ($cek_job_name <= 0) {
+            # code...
+            if (count($extract) == 1) {
                 $num_add = '';
-            }
-            
-            $get_job_name = $this->training_parameter->where($data[$record_job_title],$table_job,'id_job')->row();
+                $max = 'max(created_at) created_at';
+                $get_max_id = $this->training_parameter->get_select_max($table_job,$max)->row();
+                $cek_id_job = $this->training_parameter->where($get_max_id->created_at,$table_job,'created_at')->row();
     
-            $data_job_name = array(
-                'id_job' => $extract[0].'.'.$extract[1].'.'.$num_add.''.strval($extract[2]+1),
-                'job_title' => $get_job_name->job_title,
-            );
+                if (is_null($get_max_id->created_at)) {
+                    $data_job_name = array(
+                        'id_job' => 1,
+                        'job_title' => $data['job_name'],
+                        'created_at' => $data['created_at']
+                    );
+                } else {
+                    $data_job_name = array(
+                        'id_job' => $cek_id_job->id_job+1,
+                        'job_title' => $data['job_name'],
+                        'created_at' => $data['created_at']
+                    );
+                }
+                
+            } else {
+                if (strlen($extract[2]+1) == 1) {
+                    $num_add = '00';
+                } else if (strlen($extract[2]+1) == 2) {
+                    $num_add = '0';
+                } else {
+                    $num_add = '';
+                }
+                
+                $get_job_name = $this->training_parameter->where($data[$record_job_title],$table_job,'id_job')->row();
+        
+                $data_job_name = array(
+                    'id_job' => $extract[0].'.'.$extract[1].'.'.$num_add.''.strval($extract[2]+1),
+                    'job_title' => $get_job_name->job_title,
+                );
+            }
+        } else {
+            $data_job_name = ['id_job' => $data['job_name']];
         }
+        // var_dump($data_job_name);die;
+        
 
         if ($cek_job_name <= 0) {
             $this->training_parameter->save($data_job_name,$table_job);
@@ -372,8 +380,7 @@ class Position_c extends CI_Controller {
             $msg = 'no';
 
         }
-        // var_dump($msg,$cek_job_name);die;
-
+        
         $cek = $this->training_parameter->where_double($table,'position_id','job_name',$data['position_id'],$data['job_name'])->num_rows();
         
         // cek kode 
@@ -385,7 +392,7 @@ class Position_c extends CI_Controller {
 
             if ($data['form_'] == 'send') {
                 // var_dump($data_job_name['job_title']);die;
-                if ($data_job_name['job_title'] == $data['job_name']) {
+                if ($data_job_name['id_job'] == $data['job_name']) {
                     $data_create_job = array(
                         'job_name' => $data_job_name['id_job'],
                         'function_group' => $data['function_group'],
@@ -403,7 +410,14 @@ class Position_c extends CI_Controller {
                         'status' => $data['status'],
                         'user_name' => $data['user_name'],
                     );
-                    $save = $this->training_parameter->save($data_create_job,$table); 
+                    $save = $this->training_parameter->save_send($data_create_job,$table); 
+
+                    $data_create_status_job = array(
+                        'job_list_id' => $save,
+                        'status' => 0,
+                        'created_at' => $data['created_at']
+                    );
+                    $save = $this->training_parameter->save($data_create_status_job,'status_job'); 
                     
                     if ($save == true) {
                         $msg = 'Berhasil di Simpan';
@@ -412,7 +426,7 @@ class Position_c extends CI_Controller {
                     }
                 } else {
                     $data_create_job_sec = array(
-                        'job_name' => $data['job_name'],
+                        'job_name' => $data_job_name['id_job'],
                         'function_group' => $data['function_group'],
                         'job_function' => $data['job_function'],
                         'job_sub_function' => $data['job_sub_function'],
@@ -428,7 +442,15 @@ class Position_c extends CI_Controller {
                         'status' => $data['status'],
                         'user_name' => $data['user_name'],
                     );
-                    $save = $this->training_parameter->save($data_create_job_sec,$table);
+                    $save = $this->training_parameter->save_send($data_create_job_sec,$table);
+
+                    $data_create_status_job = array(
+                        'job_list_id' => $save,
+                        'status' => 0,
+                        'created_at' => $data['created_at']
+                    );
+                    $save = $this->training_parameter->save($data_create_status_job,'status_job'); 
+                    
                     if ($save == true) {
                         $msg = 'Berhasil di Simpan';
                     }else{
@@ -440,7 +462,7 @@ class Position_c extends CI_Controller {
             } else {
                 # code...
             
-                if ($data_job_name['job_title'] == $data['job_name']) {
+                if ($data_job_name['id_job'] == $data['job_name']) {
                     $data_create_job = array(
                         'job_name' => $data_job_name['id_job'],
                         'function_group' => $data['function_group'],
@@ -461,8 +483,6 @@ class Position_c extends CI_Controller {
                  
                     $save = $this->training_parameter->save_send($data_create_job,$table);
 
-               
-
                     $data_create_status_job = array(
                         'job_list_id' => $save,
                         'status' => 0,
@@ -477,7 +497,7 @@ class Position_c extends CI_Controller {
                     }
                 } else {
                     $data_create_job_sec = array(
-                        'job_name' => $data['job_name'],
+                        'job_name' => $data_job_name['id_job'],
                         'function_group' => $data['function_group'],
                         'job_function' => $data['job_function'],
                         'job_sub_function' => $data['job_sub_function'],

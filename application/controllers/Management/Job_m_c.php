@@ -16,6 +16,7 @@ class Job_m_c extends CI_Controller {
 
     public function index(){
         $data['title_head'] = 'Job';
+        $username = $_SESSION['username'];
         $jabatan = $_SESSION['jabatan'];
         $table_direktorat = 'direktorat'; 
         $table_organization = 'organization'; 
@@ -41,7 +42,18 @@ class Job_m_c extends CI_Controller {
         $table_tingkatpendidikan = 'edu_lvl';
         $field_hide = 'hide';
         $data['tingkat_pendidikan'] = $this->training_parameter->where_null($table_tingkatpendidikan,$field_hide,'id,edu_name')->result_array();
-     
+
+        if ($jabatan == '101') {
+            $get_branch = "SELECT distinct job_title,branch from tb_user where approval1 in (SELECT nip from list_superiors) and
+            status = 1 and job_title like '%Head%' and user_name = '$username';";
+            $data_branch = $this->db->query($get_branch)->row();
+            $get_singkatan = "SELECT distinct singkatan from branch where id_branch = '$data_branch->branch'";
+            $data_singkatan = $this->db->query($get_singkatan)->row();
+            $get_posisi = "SELECT distinct position_name from posisi where org_group = '$data_singkatan->singkatan' and position_name != '$data_branch->job_title'";
+            $data['position'] = $this->db_jobmanagement->query($get_posisi)->result_array();
+        
+        }
+
         $this->load->view('Templates/Header_v',$data);
         $this->load->view('Templates/Navbar_v',$data);
         $this->load->view('Management/Job_m_v',$data);
@@ -82,6 +94,191 @@ class Job_m_c extends CI_Controller {
       
         header('Content-Type: application/json');
         echo $this->M_Datatables->get_tables_query_job($query,$search,$where,$isWhere);
+    }
+
+    public function get_sec()
+    {
+        $username = $_SESSION['username'];
+        $get_branch = "SELECT distinct job_title,branch from tb_user where approval1 in (SELECT nip from list_superiors) and
+        status = 1 and job_title like '%Head%' and user_name = '$username';";
+        $data_branch = $this->db->query($get_branch)->row();
+        $get_singkatan = "SELECT distinct singkatan from branch where id_branch = '$data_branch->branch'";
+        $data_singkatan = $this->db->query($get_singkatan)->row();
+
+        foreach($_POST as $key => $val){
+            $data[$key] = $val;
+        }
+
+        if ($data['posisi'] == '') {
+            $where = "";
+        } else {
+            $where = " and position_name = " . "'".$data['posisi'] . "'";
+        }
+        
+
+        $query = "SELECT distinct a.id,b.position_id, b.position_name,c.job_title,CASE
+        WHEN d.status = 0 THEN 'Belum Ada'
+        WHEN d.status = 1 THEN 'Admin'
+        END status 
+        from list_jobs a
+        inner join posisi b
+        on a.position_id = b.position_id
+        inner join job c
+        on a.job_name = c.id_job
+        left join status_job d
+        on a.id = d.job_list_id 
+        where position_name in (select distinct position_name from posisi where org_group = '$data_singkatan->singkatan') and a.id = d.job_list_id $where";
+
+        $data = $this->db_jobmanagement->query($query)->result_array();
+        $counts  = $this->db_jobmanagement->query($query)->num_rows();
+
+        $callback = array(    
+            'draw' => $_POST['draw'], // Ini dari datatablenya    
+            'recordsTotal' => $counts,    
+            'recordsFiltered'=> $counts,    
+            'data' => $data
+        );
+        // var_dump(json_encode($callback));die;
+
+        header('Content-Type: application/json');
+        echo json_encode($callback); // Convert array $callback ke json
+    }
+
+    function send_admin(){
+        foreach($_POST as $key => $val){
+            $data[$key] = $val;
+        }
+
+        $data_job = $this->training_parameter->where($data['id'],'list_jobs','id')->row();
+        $now = date('Y-m-d H:i:s');
+        $data_arr = array(
+            'job_list_id' => $data_job->id,
+            'status' => 0,
+            'created_at' => $now,
+        );
+        
+        $save = $this->training_parameter->save($data_arr, 'status_job_profile');
+        if ($save == true) {
+            $msg = 'Berhasil di Simpan';
+        }else{
+            $msg = 'Gagal Menyimpan';
+        }
+        echo $msg;
+    }
+
+    function send_admin_modal()
+    {
+        $table = 'job';
+        $table_posisi = 'posisi';
+        $table_listjob = 'list_jobs';
+        $table_tujuan_jabatan = 'tujuan_jabatan';
+        $table_kewenangan = 'kewenangan';
+        $table_kompetensi = 'kompetensi';
+        $table_kpi = 'kpi';
+        $table_kualifikasi = 'kualifikasi';
+        $table_workexperience = 'work_experience';
+        $table_tingkatpendidikan = 'edu_lvl';
+        $table_jobfamily = 'job_family';
+        $table_tugas_tanggung_jawab = 'tugas_tanggung_jawab';
+        $table_category = 'job_category';
+        $on1 = 'job_name';
+        $on2 = 'id_job';
+        $field_id = 'list_jobs.id';
+        $on3 = 'position_id';
+        $on4 = 'job_list_id';
+        $on5 = 'id';
+        $field_hide = 'hide';
+        $modal = $this->input->post('modal');
+        $position_id = $this->input->post('position');
+        // var_dump($position_id);die;
+        $id = $this->input->post('id');
+        $tujuan = $this->input->post('tujuan');
+        $tugas = $this->input->post('tugas');
+        $kewenangan = $this->input->post('kewenangan');
+        $kompetensi = $this->input->post('kompetensi');
+        $kpi = $this->input->post('kpi');
+        $kualifikasi = $this->input->post('kualifikasi');
+        $kode_job_function = 'Y';
+        $field_job_function = 'flagactive';
+        
+        $data['cek_send_admin'] = $this->training_parameter->where_double('status_job_profile','job_list_id','delegate_to',$position_id,NULL)->num_rows();
+
+        $data['id_job'] = $this->training_parameter->join_2_distinct(
+            $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
+            ,$field_id,$position_id,'list_jobs.id,job.id_job,job.job_title,posisi.position_name'
+        )->row();
+        $data['work_experience'] = $this->training_parameter->get_($table_workexperience)->result_array();
+        $data['tingkat_pendidikan'] = $this->training_parameter->where_null($table_tingkatpendidikan,$field_hide,'id,edu_name')->result_array();
+
+        $data['tujuan_id'] = $this->training_parameter->join_distinct(
+           $table_tujuan_jabatan,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'tujuan_jabatan.id id_tujuan_jabatan,tujuan_jabatan.tujuan,list_jobs.id'
+        )->row();
+        
+        $data['kewenangan_id'] = $this->training_parameter->join_distinct(
+            $table_kewenangan,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kewenangan.id id_kewenangan,kewenangan.kewenangan,list_jobs.id'
+         )->result_array();
+
+        $data['kompetensi_id'] = $this->training_parameter->join_distinct(
+            $table_kompetensi,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kompetensi.id id_kompetensi,kompetensi.kompetensi,list_jobs.id'
+            )->result_array();
+
+        $data['kpi_id'] = $this->training_parameter->join_distinct(
+            $table_kpi,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'kpi.id id_kpi,kpi.kpi,list_jobs.id'
+            )->result_array();
+        
+        $data['desc_tugas_tanggung_jawab_id'] = $this->training_parameter->join_distinct(
+            $table_tugas_tanggung_jawab,$table_listjob,$on4,$on5,'list_jobs.id',$position_id,'tugas_tanggung_jawab.description,list_jobs.id'
+            )->result_array();
+
+        $data['job_family'] = $this->training_parameter->where_groupby_job_function($kode_job_function,$table_jobfamily,$field_job_function)->result_array();
+
+        $data['job_category'] = $this->training_parameter->get_($table_category)->result_array();
+
+        $query_tugas = "SELECT a.id id_list_job , c.id_job_family, c.job_family, d.id id_job_cateogory, d.job_category from list_jobs a
+        join tugas_tanggung_jawab b
+        on a.id = b.job_list_id
+        join job_family c
+        on b.job_family = c.id_job_family
+        join job_category d
+        on b.job_category = d.id
+        where b.job_list_id = $position_id";
+
+        $query = "SELECT a.id id_kualifikasi,a.persyaratan_khusus, b.id id_tingkat_pendidikan, b.edu_name, c.id id_jurusan, c.edu_mjr,a.work_experience from kualifikasi a
+        join edu_lvl b
+        on a.tingkat_pendidikan = b.id
+        join edu_mjr c
+        on a.jurusan = c.id
+        where a.job_list_id = $position_id ";
+
+        $data['tugas_tanggung_jawab_id'] = $this->db_jobmanagement->query($query_tugas)->row();
+
+        $data['kualifikasi_id'] = $this->db_jobmanagement->query($query)->result_array();
+
+        $data_kualifikasi = '';
+        foreach ($data['kualifikasi_id'] as $key => $value) {
+            $data_kualifikasi = explode('-',$value['work_experience']);
+        }
+        
+        if ($data_kualifikasi == '') {
+            $data_kual = array();
+        } else {
+            $data_kual = $data_kualifikasi;
+        }
+
+        $data['data_description'] = $data_kual;
+        
+        // var_dump($data['data_description']);die;
+        $data['position'] = $position_id;
+        $data['modal_title'] = $modal;
+        $data['id'] = $id;
+        $data['tujuan'] = $tujuan;
+        $data['tugas'] = $tugas;
+        $data['kewenangan'] = $kewenangan;
+        $data['kompetensi'] = $kompetensi;
+        $data['kpi'] = $kpi;
+        $data['kualifikasi'] = $kualifikasi;
+        $html_modal = $this->load->view('Modal/Modal_edit_job_delegate',$data,TRUE);
+        echo $html_modal;
     }
 
     function save_(){
@@ -172,17 +369,19 @@ class Job_m_c extends CI_Controller {
 
     function view_job()
     {
-        $id_job = $this->input->get('job');
+        $id_job = $this->input->post('job');
         $table = 'job';
         $table_posisi = 'posisi';
         $table_tugas_tanggung_jawab = 'tugas_tanggung_jawab';
         $table_kewenangan = 'kewenangan';
         $table_kompetensi = 'kompetensi';
+        $modal = $this->input->post('modal');
         $table_listjob = 'list_jobs';
         $on1 = 'job_name';
         $on2 = 'id_job';
         $field_id = 'list_jobs.id';
         $on3 = 'position_id';
+        $id = $this->input->post('id');
         
         $data['data_job'] = $this->training_parameter->join_2_distinct(
             $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
@@ -229,6 +428,7 @@ class Job_m_c extends CI_Controller {
         $data['data_profile'] = $this->db_jobmanagement->query($query)->row();
         $data['pengalaman_kerja'] = $this->db_jobmanagement->query($query_pengalaman_kerja)->result_array();
         // var_dump($data['pengalaman_kerja']);die;
+        $data['id'] = $id;
 
         $data['title_head'] = 'View Job';
         $jabatan = $_SESSION['jabatan'];
@@ -237,10 +437,13 @@ class Job_m_c extends CI_Controller {
         $data['list_menu'] = $this->db->get('menu')->result_array();
         $data['access_crud'] = access_crud($this->id);
 
-        $this->load->view('Templates/Header_v',$data);
-        $this->load->view('Templates/Navbar_v',$data);
-        $this->load->view('Job/Job_v',$data);
-        $this->load->view('Templates/Footer_v');
+        $data['modal_title'] = $modal;
+        // $this->load->view('Templates/Header_v',$data);
+        // $this->load->view('Templates/Navbar_v',$data);
+        // $this->load->view('Job/Job_v',$data);
+        // $this->load->view('Templates/Footer_v');
+        $html_modal = $this->load->view('Modal/Modal_view_job',$data,TRUE);
+        echo $html_modal;
     }
 
     function modal_edit()

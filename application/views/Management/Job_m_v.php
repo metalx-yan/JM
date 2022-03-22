@@ -82,37 +82,25 @@
                   <?php } else if($jabatan == '101') {?>
                     <div class="card">
                     <div class="card-header">
-                      Job Desc Info
+                      Search
                     </div>
                     <form id="form_search">
 
                       <div class="card-body">
                             <div class="mb-3 row">
-                              <label class="col-sm-5 col-form-label">Kode Job</label>
+                              <label class="col-sm-5 col-form-label">Position</label>
                               <div class="col-sm-7 form-group">
-                              <select onchange="check_v(this)" name="kode" id="input-kode" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                                <!-- <option value="" selected></option>
-                                <?php foreach($direktorat as $direktorat):?>
-                                    <option value="<?= $direktorat['id_dir']?>"><?= $direktorat['dir_group_name']; ?></option>
-                                <?php endforeach; ?> -->
-                              </select>
-                              <span id="error"></span>
-                              </div>
-                            </div>
-
-                            <div class="mb-3 row">
-                              <label class="col-sm-5 col-form-label">Nama Job</label>
-                              <div class="col-sm-7 form-group">
-                              <select onchange="check_v(this)" name="name" id="input-name" class="form-select form-select-sm name" aria-label=".form-select-sm example">
+                              <select onchange="check_v(this)" name="posisi" id="input-posisi" class="form-select form-select-sm" data-live-search="true" aria-label=".form-select-sm example" required>
                                 <option value="" selected></option>
+                                <?php foreach($position as $p):?>
+                                    <option value="<?= $p['position_name']?>"><?= $p['position_name']; ?></option>
+                                <?php endforeach; ?>
                               </select>
                               <span id="error"></span>
                               </div>
                             </div>
 
-                            <button type="button" data="search" onclick="" class="btn btn-warning float-end" style="margin-left:10px">Send Back</button>
-                            <div></div>
-                            <button type="button" data="search" onclick="" class="btn btn-warning float-end">Approve</button>
+                              <button type="button" data="search" onclick="subsearch(this)" class="btn btn-warning float-end">Search</button>
                               <br>
                       </div>
                       </form>
@@ -120,11 +108,23 @@
                   <br>
                   <div class="card">
                     <div class="card-header">
-                      Job Desc Detail
+                      List Job
                     </div>
                     <div class="card-body">
-                      
+                      <table id="manage_menu_sec" class="table table-bordered table-striped text-center align-middle" width="100%">
+                        <thead>
+                            <tr class="text-center">
+                                <th>No</th>
+                                <th>Kode Posisi</th>
+                                <th>Nama Posisi</th>
+                                <th>Nama Job</th>
+                                <th>Status</th>
+                                <th>Job</th>
+                            </tr>
+                        </thead>
+                      </table>
                     </div>
+                    
                   </div>
                 <?php } ?>
             </div>
@@ -132,6 +132,8 @@
     </div>
     <div class="modal_add"></div>
     <div class="modal_edit"></div>
+    <div class="modal_view"></div>
+    <div class="modal_send_admin"></div>
 
 </section>
 
@@ -148,65 +150,158 @@ function subsearch(data_) {
 
 function search(form) {
     console.log(form);
-  var datatable = $('#manage_menu').DataTable({
-    "destroy": true,
-    "processing": false,
-    "responsive": true,
-    "serverSide": true,
-    "ordering": true, // Set true agar bisa di sorting
-    "ajax": {
-        "url": "<?= base_url('Management/Job_m_c/get/'); ?>", // URL file untuk proses select datanya
-        "type": "POST",
-        "data": form,
-        beforeSend: function() {
-            $("#loader").show();
-        },
-        complete: function() {
-            $("#loader").hide();
-        },
-    },
-    "deferRender": true,
-    "aLengthMenu": [
-        [5, 10, 50],
-        [5, 10, 50]
-    ], // Combobox Limit
-        "columns": [
-            {
-                "data": 'id',
-                "sortable": false, // !!! id_sort
-                render: function(data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
-            },
-            {
-                "data": "position_id"
-            },
-            {
-                "data": "job_title"
-            },
-            {
-                "data": "position_name"
-            },
-            {
-                data: null,
-                "sortable": false,
-                render: function(data, type, row, meta) {
-                    adds = '<button class="btn btn-primary m-3" value="'+data.id+'" onclick="view_modal()">View</button>'
-                    views = '<button id="btn-edits" value="'+data.id+'" class="btn btn-warning m-3" onclick="edit_modal()">Edit</button>'
-                    return adds + views 
+    if (form.direktorat == undefined && form.organisasi == undefined) {
+        console.log(form)
+        var datatable = $('#manage_menu_sec').DataTable({
+            "destroy": true,
+            "processing": false,
+            "responsive": true,
+            "serverSide": true,
+            "ordering": true,  
+            "ajax": {
+                "url": "<?= base_url('Management/Job_m_c/get_sec/'); ?>", 
+                "type": "POST",
+                "data": form,
+                beforeSend: function() {
+                    $("#loader").show();
                 },
+                complete: function() {
+                    $("#loader").hide();
+                },
+            },
+            "deferRender": true,
+            "aLengthMenu": [
+                [5, 10, 50],
+                [5, 10, 50]
+            ],  
+                "columns": [
+                    {
+                        "data": 'id',
+                        "sortable": false,  
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    {
+                        "data": "position_id"
+                    },
+                    {
+                        "data": "position_name"
+                    },
+                    
+                    {
+                        "data": "job_title"
+                    },
+                    
+                    {
+                        "data": "status"
+                    },
+                    {
+                        data: null,
+                        "sortable": false,
+                        render: function(data, type, row, meta) {
+                            if (data.status == 'Admin') {
+                                adds = '<button class="btn btn-primary m-3" value="'+data.id+'" onclick="view_modal()">View</button>'
+                                views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="send_admin_modal()">Edit</button>'
+                                return adds + views
+                                
+                            } else {
+                                adds = '<button class="btn btn-primary m-3" disabled >View</button>'
+                                views = '<button id="btn-views"  class="btn btn-warning m-3" disabled >Edit</button>'
+                                return adds + views
+                            }
+                        },
 
-            }
-        ],
-  });
+                    }
+                    
+                ],
+        });
+    } else {
+    var datatable = $('#manage_menu').DataTable({
+        "destroy": true,
+        "processing": false,
+        "responsive": true,
+        "serverSide": true,
+        "ordering": true, // Set true agar bisa di sorting
+        "ajax": {
+            "url": "<?= base_url('Management/Job_m_c/get/'); ?>", // URL file untuk proses select datanya
+            "type": "POST",
+            "data": form,
+            beforeSend: function() {
+                $("#loader").show();
+            },
+            complete: function() {
+                $("#loader").hide();
+            },
+        },
+        "deferRender": true,
+        "aLengthMenu": [
+            [5, 10, 50],
+            [5, 10, 50]
+        ], // Combobox Limit
+            "columns": [
+                {
+                    "data": 'id',
+                    "sortable": false, // !!! id_sort
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
+                {
+                    "data": "position_id"
+                },
+                {
+                    "data": "job_title"
+                },
+                {
+                    "data": "position_name"
+                },
+                {
+                    data: null,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        adds = '<button class="btn btn-primary m-3" value="'+data.id+'" onclick="view_modal()">View</button>'
+                        views = '<button id="btn-edits" value="'+data.id+'" class="btn btn-warning m-3" onclick="edit_modal()">Edit</button>'
+                        return adds + views 
+                    },
+
+                }
+            ],
+    });
+    }
 }
+
+// function view() {
+//     var val = {};
+//     val.modal = 'MODAL VIEW JOB';
+//     val.id = 'modal_edit';
+//     val.form_id = "form_" + val.id;
+//     val.job = event.target.value;
+//     val.tujuan = 'tujuan';
+//     val.tugas = 'tugas';
+//     val.kewenangan = 'kewenangan';
+//     val.kompetensi = 'kompetensi';
+//     val.kualifikasi = 'kualifikasi';
+//     $.ajax({
+//         url: '<?= base_url('Management/Job_m_c/view/') ?>',
+//         type: "get",
+//         data: val,
+//         success: function(res) {
+//             window.location.assign('<?php echo base_url() ?>Management/Job_m_c/view/?job=' + val.job + '');
+//         },
+//         error: function(jqXHR, textStatus, errorThrown) {
+//             alert('gagal');
+//         }
+//     });
+// };
 
 function view_modal() {
     var val = {};
     val.modal = 'MODAL VIEW JOB';
-    val.id = 'modal_edit';
+    val.id = 'modal_view';
     val.form_id = "form_" + val.id;
     val.job = event.target.value;
+    console.log(val);
     val.tujuan = 'tujuan';
     val.tugas = 'tugas';
     val.kewenangan = 'kewenangan';
@@ -214,16 +309,108 @@ function view_modal() {
     val.kualifikasi = 'kualifikasi';
     $.ajax({
         url: '<?= base_url('Management/Job_m_c/view_job/') ?>',
-        type: "get",
+        type: "POST",
         data: val,
         success: function(res) {
-            window.location.assign('<?php echo base_url() ?>Management/Job_m_c/view_job/?job=' + val.job + '');
+            $(".modal_view").html(res);
+            $('#modal_view').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modal_view').modal('show');
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert('gagal');
         }
     });
 };
+
+function send(form){
+    Swal.fire({
+        title: 'Do you want to save the changes?',
+        showDenyButton: true,
+        confirmButtonText: 'Save',
+        denyButtonText: `Cancel`,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '<?= base_url('Management/Job_m_c/send_admin/') ?>',
+                type: "post",
+                data: form,
+                beforeSend: function() {
+                    $("#loader").show();
+                },
+                complete: function() {
+                    $("#loader").hide();
+                },
+                success: function(res) {
+                    if (res == 'Berhasil di Simpan') {
+                        $('#modal_send_admin').modal('hide');
+                        Swal.fire({
+                            title: 'Your has been saved.',
+                            icon: 'success',
+                        });
+
+                        setTimeout(function() {
+                            location.reload(true);
+                        }, 1000);
+                    } else {
+                        alert(res)
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('gagal');
+                }
+            });
+        }
+    })
+}
+
+function send_admin_modal() {
+    var val = {};
+    val.modal = 'MODAL EDIT JOB';
+    val.id = 'modal_send_admin';
+    val.form_id = "form_" + val.id;
+    val.position = event.target.value;
+    // console.log(val.position)
+    val.tujuan = 'tujuan';
+    val.tugas = 'tugas';
+    val.kewenangan = 'kewenangan';
+    val.kompetensi = 'kompetensi';
+    val.kualifikasi = 'kualifikasi';
+    val.kpi = 'kpi';
+    $.ajax({
+        url: '<?= base_url('/Management/Job_m_c/send_admin_modal/') ?>',
+        type: "post",
+        data: val,
+        success: function(res) {
+
+            $(".modal_send_admin").html(res);
+            $('#modal_send_admin').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modal_send_admin').modal('show');
+            
+            $('#input-tingkat_pendidikan').change(function(){ 
+                // alert('tes');
+                // var value = $(this).val();
+                var value = $('#input-tingkat_pendidikan option:selected').text();
+                var val = {};
+                val.tingkat_pendidikan = value;
+                console.log(value)
+                $.post('<?php echo base_url()?>Management/Job_m_c/change_jurusan',val,function(data){ 
+                console.log(data);
+                    $('.jurusan').html(data);
+                });
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('gagal');
+        }
+    });
+};
+
 
 function action_submit(data_) {
     action = $(data_).attr('data');
@@ -236,7 +423,7 @@ function action_submit(data_) {
         delete_();
     } else {
         console.log(action)
-        if (action == 'kualifikasi'  || action == 'tugas') {
+        if (action == 'kualifikasi'  || action == 'tugas' || action == 'modal_send_admin') {
             $.ajax({
                 type: "POST",
                 url: "<?php echo site_url('Management/Job_m_c/validate_kual'); ?>",
@@ -244,7 +431,11 @@ function action_submit(data_) {
                 dataType: "json",
                 success: function(data) {
                     if (data.action == 'ok') {
-                        save_multiple(form);
+                        if (action == 'modal_send_admin') {
+                            send(form)
+                        } else {
+                            save_multiple(form);
+                        }
                     } else {
                         $.each(data, function(key, value) {
                             if (value == '') {
