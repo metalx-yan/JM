@@ -261,7 +261,7 @@
                                 
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <input type="checkbox" name="description[]" value="<?=  $work['id']?>" <?= (in_array($work['id'], $data_description)) ? 'checked' : ''?>>  <?= $work['description']?>
+                                        <input type="checkbox" name="description[]" <?= $cek_send_admin == 1 ? 'disabled' : '' ?> value="<?=  $work['id']?>" <?= (in_array($work['id'], $data_description)) ? 'checked' : ''?>>  <?= $work['description']?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

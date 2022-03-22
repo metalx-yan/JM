@@ -137,12 +137,18 @@
         </div>
         </div>
         <div class="modal-footer">
-            <?php if ($id_job->status_job == 1) {  ?>
-          <button type="button"  class="btn btn-success" style="cursor: default;">Approve</button>
-            <?php } else { ?>
-          <button type="button" data="<?= $id ?>" onclick="action_submit(this)" class="btn btn-primary">Save</button>
-          <button type="button" data="<?= $approve ?>" onclick="action_submit(this)" class="btn btn-primary">Approve</button>
-            <?php } ?>
+            <?php if ($id_job->status_job == 1 && $id_job->status_akhir ==  null) {  ?>
+              <button type="button"  class="btn btn-success" style="cursor: default;">Approve</button>
+              <?php } else if($id_job->status_job == 1 && $id_job->status_akhir == 0) { ?>
+                <button type="button" data="<?= $id ?>" onclick="action_submit(this)" class="btn btn-primary">Save Job Profile</button>
+                <button type="button" data="<?= $approve ?>" onclick="action_submit(this)" class="btn btn-primary">Approve Job Profile</button>
+            <?php } else if($id_job->status_job == 0 && $id_job->status_akhir == null) { ?>
+                <button type="button" data="<?= $id ?>" onclick="action_submit(this)" class="btn btn-primary">Save Job</button>
+                <button type="button" data="<?= $approve ?>" onclick="action_submit(this)" class="btn btn-primary">Approve Job</button>
+            <?php } else  { ?>
+              <button type="button"  class="btn btn-success" style="cursor: default;">Approve</button>
+
+              <?php }?>
         
         </div>
       </form>

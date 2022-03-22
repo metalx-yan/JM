@@ -190,14 +190,17 @@
       // }
 
       var datatable = $('#manage_menu').DataTable({
-        rowCallback: function(row, data, index){
-          if(data.status == '1'){
-            $(row).find('td:eq(0)').css('background-color', '#f2d544').css('color', 'white');
-          }
-          if(data.status == '0'){
-            $(row).find('td:eq(0)').css('background-color', '#f26a44').css('color', 'white');
-          }
-        },
+        // rowCallback: function(row, data, index){
+        //   if(data.status == '1'){
+        //     $(row).find('td:eq(0)').css('background-color', '#f2d544').css('color', 'white');
+        //   }
+        //   if(data.status == '0'){
+        //     $(row).find('td:eq(0)').css('background-color', '#f26a44').css('color', 'white');
+        //   }
+        //   if(data.status_akhir == '1'){
+        //     $(row).find('td:eq(0)').css('background-color', '#f26a44').css('color', 'white');
+        //   }
+        // },
         "destroy": true,
         "processing": false,
         "responsive": true,
@@ -239,8 +242,10 @@
                     "sortable": false,
                     render: function(data, type, row, meta) {
                       if (data.role == '100') {
-                        views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="view_modal()">View</button>'
-                        return views
+                        // if (data.status_akhir == 0) {
+                          views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="view_modal()">View</button>'
+                          return views
+                        // }
                       } else {
                         views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="review_modal()">View</button>'
                         return views

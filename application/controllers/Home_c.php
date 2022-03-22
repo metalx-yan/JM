@@ -40,7 +40,7 @@ class Home_c extends CI_Controller
         if ($jabatan == '100') {
             # code...
             // , CASE WHEN b.status = 0 THEN 'Belum Ada' WHEN b.status = 1 THEN 'Admin' END status_job 
-            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan,b.status, $jabatan as role
+            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan,b.status, z.status status_akhir, $jabatan as role
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -53,7 +53,7 @@ class Home_c extends CI_Controller
             left join status_job b
             on a.id = b.job_list_id
             left join status_job_profile z
-            on a.id = b.job_list_id
+            on a.id = z.job_list_id
             where a.id = b.job_list_id and e.jabatan != '100' and d.status ='1'";
 
             $data = $this->db_jobmanagement->query($query)->result_array();
@@ -130,7 +130,7 @@ class Home_c extends CI_Controller
         $field_job_disciline_code = 'Discipline_Code !=';
         $field_job_discipline = 'Discipline_Description';
        
-        $query = "SELECT distinct a.id,b.id_job,b.job_title,c.id_job_function,c.job_function,d.id_job_family,d.job_family,e.id as id_job_sub_function,e.job_sub_function,f.id as id_job_sub_family,f.job_sub_family,g.Discipline_Description,g.Discipline_Code,z.id_job_level,z.Grade_Name,a.function_group,a.purpose,j.status status_job from list_jobs a
+        $query = "SELECT distinct a.id,b.id_job,b.job_title,c.id_job_function,c.job_function,d.id_job_family,d.job_family,e.id as id_job_sub_function,e.job_sub_function,f.id as id_job_sub_family,f.job_sub_family,g.Discipline_Description,g.Discipline_Code,z.id_job_level,z.Grade_Name,a.function_group,a.purpose,j.status status_job, x.status status_akhir from list_jobs a
         inner join job b
         on a.job_name = b.id_job
         inner join job_function c
@@ -151,6 +151,8 @@ class Home_c extends CI_Controller
         on a.user_name = i.user_name
         left join status_job j
         on a.id = j.job_list_id
+        left join status_job_profile x
+        on a.id = x.job_list_id
         where  a.id = '$job_id'";
 
         $data['id_job'] = $this->db_jobmanagement->query($query)->row();
