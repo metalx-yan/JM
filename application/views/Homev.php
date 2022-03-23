@@ -36,9 +36,18 @@
             </div>
             <div class="col-md-4"></div>
           </div>
-          <p><span class="badge rounded-pill " style="background-color: #f26a44;">&nbsp;</span> <b style="font-size: 14px;">On Progress</b></p> 
-          <p><span class="badge rounded-pill " style="background-color: #f2d544;">&nbsp;</span> <b style="font-size: 14px;">Validasi Job (Admin)</b></p>
-          <p><span class="badge rounded-pill " style="background-color: #3fd467;">&nbsp;</span> <b style="font-size: 14px;">Validasi Job Profile (Admin)</b></p>
+          <?php if ($_SESSION['jabatan'] == '100') { ?>
+          <p><span class="badge rounded-pill " style="background-color: #f26a44;">&nbsp;</span> <b style="font-size: 14px;">On Progress Validation Job</b></p> 
+          <p><span class="badge rounded-pill " style="background-color: rgb(88 183 165);">&nbsp;</span> <b style="font-size: 14px;">Waiting For Job Profile Submission</b></p> 
+          <p><span class="badge rounded-pill " style="background-color: #f2d544;">&nbsp;</span> <b style="font-size: 14px;">On Progress Validation Job Profile</b></p>
+          <p><span class="badge rounded-pill " style="background-color: #3fd467;">&nbsp;</span> <b style="font-size: 14px;">Validation Approved</b></p>
+          <?php } else if ($_SESSION['jabatan'] == '101') {?>
+            <!-- <p><span class="badge rounded-pill " style="background-color: #f26a44;">&nbsp;</span> <b style="font-size: 14px;">On Progress Validation Job</b></p>  -->
+            <p><span class="badge rounded-pill " style="background-color: rgb(88 183 165);">&nbsp;</span> <b style="font-size: 14px;">Waiting Send Job Profile</b></p> 
+            <p><span class="badge rounded-pill " style="background-color: #cad92e;">&nbsp;</span> <b style="font-size: 14px;">Waiting Approve Job Profile</b></p> 
+            <!-- <p><span class="badge rounded-pill " style="background-color: #f2d544;">&nbsp;</span> <b style="font-size: 14px;">On Progress Validation Job Profile</b></p> -->
+            <p><span class="badge rounded-pill " style="background-color: #3fd467;">&nbsp;</span> <b style="font-size: 14px;">Validation Approved</b></p>
+          <?php } ?>
           <table id="manage_menu" class="table table-bordered table-striped text-center align-middle" width="100%">
             <thead>
                 <tr class="text-center">
@@ -190,17 +199,33 @@
       // }
 
       var datatable = $('#manage_menu').DataTable({
-        // rowCallback: function(row, data, index){
-        //   if(data.status == '1'){
-        //     $(row).find('td:eq(0)').css('background-color', '#f2d544').css('color', 'white');
-        //   }
-        //   if(data.status == '0'){
-        //     $(row).find('td:eq(0)').css('background-color', '#f26a44').css('color', 'white');
-        //   }
-        //   if(data.status_akhir == '1'){
-        //     $(row).find('td:eq(0)').css('background-color', '#f26a44').css('color', 'white');
-        //   }
-        // },
+        rowCallback: function(row, data, index){
+          if (data.role == '100') {
+            if(data.status == '0' && data.status_akhir == null){
+              $(row).find('td:eq(0)').css('background-color', '#f26a44').css('color', 'white');
+            }
+            if(data.status == '1' && data.status_akhir == null){
+              $(row).find('td:eq(0)').css('background-color', 'rgb(88 183 165)').css('color', 'white');
+            }
+            if(data.status == '1' && data.status_akhir == '0'){
+              $(row).find('td:eq(0)').css('background-color', '#f2d544').css('color', 'white');
+            }
+            if(data.status == '1' && data.status_akhir == '1'){
+              $(row).find('td:eq(0)').css('background-color', '#3fd467').css('color', 'white');
+            }
+          } else {
+            if(data.status == '1' && data.status_akhir == null){
+              $(row).find('td:eq(0)').css('background-color', 'rgb(88 183 165)').css('color', 'white');
+            }
+            if(data.status == '1' && data.status_akhir == 0){
+              $(row).find('td:eq(0)').css('background-color', '#cad92e').css('color', 'white');
+            }
+            if(data.status == '1' && data.status_akhir == 1){
+              $(row).find('td:eq(0)').css('background-color', '#3fd467').css('color', 'white');
+            }
+          }
+         
+        },
         "destroy": true,
         "processing": false,
         "responsive": true,

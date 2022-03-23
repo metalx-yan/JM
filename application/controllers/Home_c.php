@@ -78,7 +78,7 @@ class Home_c extends CI_Controller
             $data_branch = $this->db->query($get_branch)->row();
             $get_singkatan = "SELECT distinct singkatan from branch where id_branch = '$data_branch->branch'";
             $data_singkatan = $this->db->query($get_singkatan)->row();
-            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,b.nama,e.jabatan,b.status
+            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,b.nama,e.jabatan,b.status, k.status status_akhir ,$jabatan as role
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -90,10 +90,10 @@ class Home_c extends CI_Controller
             on a.user_name = e.user_name						
             left join (select x.id,z.nama,x.status,x.job_list_id,z.status status_aktif from status_job x
             join db_jrms.tb_user z
-            on x.approved_by = z.user_name
-            left join status_job_profile k
-            on z.user_name = k.approved_by)  b
+            on x.approved_by = z.user_name)  b
             on a.id = b.job_list_id
+            left join status_job_profile k
+            on a.id = k.job_list_id
             where position_name in (select distinct position_name from posisi where org_group = '$data_singkatan->singkatan') and b.status = 1 and b.status_aktif = 1";
 
             $data = $this->db_jobmanagement->query($query)->result_array();
