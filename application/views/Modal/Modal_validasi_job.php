@@ -141,7 +141,7 @@
             <button type="button" class="btn btn-success" style="cursor: default;">Approve Job</button>
           <?php } else if ($id_job->status_job == 1 && $id_job->status_akhir == 0) { ?>
             <button type="button" data="<?= $id ?>" onclick="action_submit(this)" class="btn btn-primary">Save Job Profile</button>
-            <button type="button" data="<?= $approve ?>" onclick="action_submit(this)" class="btn btn-primary">Approve Job Profile</button>
+            <button type="button" data="<?= $approve_job_profile ?>" onclick="action_submit(this)" class="btn btn-primary">Approve Job Profile</button>
           <?php } else if ($id_job->status_job == 0 && $id_job->status_akhir == null) { ?>
             <button type="button" data="<?= $id ?>" onclick="action_submit(this)" class="btn btn-primary">Save Job</button>
             <button type="button" data="<?= $approve ?>" onclick="action_submit(this)" class="btn btn-primary">Approve Job</button>

@@ -117,6 +117,7 @@ class Home_c extends CI_Controller
         $job_id = $this->input->post('job');
         $id = $this->input->post('id');
         $approve = $this->input->post('approve');
+        $approve_job_profile = $this->input->post('approve_job_profile');
         $table_job = 'job';
         $table_jobfunction = 'job_function';
         $table_jobfamily = 'job_family';
@@ -170,6 +171,7 @@ class Home_c extends CI_Controller
         $data['modal_title'] = $modal;
         $data['id'] = $id;
         $data['approve'] = $approve;
+        $data['approve_job_profile'] = $approve_job_profile;
         $html_modal = $this->load->view('Modal/Modal_validasi_job',$data,TRUE);
         echo $html_modal;
     }
@@ -374,7 +376,9 @@ class Home_c extends CI_Controller
             $msg = 'no';
 
         }
-        // var_dump($data['job_name'],$data_job_name['id_job']);die;
+        
+
+        // var_dump($get_job_profile_id);die;
 
 
         $get_before_id = $this->training_parameter->where($data['before_id'],$table,'id')->row();
@@ -410,7 +414,16 @@ class Home_c extends CI_Controller
                     $saving = $this->training_parameter->save_send($data_create_job,$table);
                     
                     $status_job_change = ['job_list_id' => $saving];
-                    $save = $this->training_parameter->update($get_before_id->id,$status_job_change,'status_job','job_list_id'); 
+                    $save = $this->training_parameter->update($get_before_id->id,$status_job_change,'status_job','job_list_id');
+                    $get_job_profile_id = $this->training_parameter->where($data['id'],'status_job_profile','job_list_id')->num_rows();
+
+                    if ($get_job_profile_id > 0) {
+                        $id_job_prof = ['job_list_id' => $saving];
+                        $this->training_parameter->update($data['id'],$id_job_prof,'status_job_profile','job_list_id');
+                    } else {
+                        
+                    }
+                    
                     $verify_vals = ['verify_validasi' => 'YES'];
                     $this->training_parameter->update($get_before_id->id,$verify_vals,$table,'id'); 
                     $verify_vals = ['verify_validasi' => NULL];
@@ -448,6 +461,14 @@ class Home_c extends CI_Controller
                 
                 $status_job_change = ['job_list_id' => $saving];
                 $save = $this->training_parameter->update($get_before_id->id,$status_job_change,'status_job','job_list_id'); 
+                $get_job_profile_id = $this->training_parameter->where($data['id'],'status_job_profile','job_list_id')->num_rows();
+
+                if ($get_job_profile_id > 0) {
+                    $id_job_prof = ['job_list_id' => $saving];
+                    $this->training_parameter->update($data['id'],$id_job_prof,'status_job_profile','job_list_id');
+                } else {
+                    
+                }
                 $verify_vals = ['verify_validasi' => 'YES'];
                 $this->training_parameter->update($get_before_id->id,$verify_vals,$table,'id'); 
                 $verify_vals = ['verify_validasi' => NULL];
@@ -465,6 +486,29 @@ class Home_c extends CI_Controller
         
         echo $msg;
 
+    }
+
+    function save_job_profile(){
+        foreach($_POST as $key => $val){
+            $data[$key] = $val;
+        }
+
+        $username = $_SESSION['username'];
+        $get_job_profile_id = $this->training_parameter->where($data['id'],'status_job_profile','job_list_id')->num_rows();
+
+        if ($get_job_profile_id > 0) {
+            $id_job_prof = ['status' => '1', 'approved_by' => $username];
+            $save = $this->training_parameter->update($data['id'],$id_job_prof,'status_job_profile','job_list_id');
+        } else {
+            
+        }
+        if ($save == true) {
+
+            $msg = 'Berhasil di Simpan';
+        }else{
+            $msg = 'Gagal Menyimpan';
+        }
+        echo $msg;
     }
 
     function validate(){

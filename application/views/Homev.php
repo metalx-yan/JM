@@ -42,13 +42,11 @@
           <p><span class="badge rounded-pill " style="background-color: #f2d544;">&nbsp;</span> <b style="font-size: 14px;">On Progress Validation Job Profile</b></p>
           <p><span class="badge rounded-pill " style="background-color: #3fd467;">&nbsp;</span> <b style="font-size: 14px;">Validation Approved</b></p>
           <?php } else if ($_SESSION['jabatan'] == '101') {?>
-            <!-- <p><span class="badge rounded-pill " style="background-color: #f26a44;">&nbsp;</span> <b style="font-size: 14px;">On Progress Validation Job</b></p>  -->
             <p><span class="badge rounded-pill " style="background-color: rgb(88 183 165);">&nbsp;</span> <b style="font-size: 14px;">Waiting Send Job Profile</b></p> 
             <p><span class="badge rounded-pill " style="background-color: #cad92e;">&nbsp;</span> <b style="font-size: 14px;">Waiting Approve Job Profile</b></p> 
-            <!-- <p><span class="badge rounded-pill " style="background-color: #f2d544;">&nbsp;</span> <b style="font-size: 14px;">On Progress Validation Job Profile</b></p> -->
             <p><span class="badge rounded-pill " style="background-color: #3fd467;">&nbsp;</span> <b style="font-size: 14px;">Validation Approved</b></p>
           <?php } ?>
-          <table id="manage_menu" class="table table-bordered table-striped text-center align-middle" width="100%">
+          <table id="manage_menu" class="table table-bordered text-center align-middle" width="100%">
             <thead>
                 <tr class="text-center">
                   <th scope="col">ID Job</th>
@@ -293,6 +291,7 @@
         val.modal = 'MODAL VIEW JOB';
         val.id = 'modal_view';
         val.approve = 'modal_approve';
+        val.approve_job_profile = 'modal_approve_job_profile';
         val.form_id = "form_" + val.id;
         val.job = event.target.value;
         console.log(val);
@@ -330,6 +329,8 @@
                 if (data.action == 'ok') {
                     if (action == 'modal_view') {
                         save(form);
+                    } else if(action == 'modal_approve_job_profile') {
+                      approve_job_profile(form);
                     } else {
                       approve(form);
 
@@ -408,6 +409,53 @@
           if (result.isConfirmed) {
               $.ajax({
                   url: '<?= base_url('/Home_c/save/') ?>',
+                  type: "post",
+                  data: form,
+                  beforeSend: function() {
+                      $("#loader").show();
+                  },
+                  complete: function() {
+                      $("#loader").hide();
+                  },
+                  success: function(res) {
+                      if (res == 'Berhasil di Simpan') {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: 'Your has been saved.',
+                              icon: 'success',
+                          });
+
+                          setTimeout(function() {
+                              location.reload(true);
+                          }, 1000);
+                      } else {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: res,
+                              icon: 'error',
+                          });
+
+                        
+                      }
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) {
+                      alert('gagal');
+                  }
+              });
+          }
+      })
+  }
+  function approve_job_profile(form) {
+      console.log(form);
+      Swal.fire({
+          title: 'Do you want to save the changes?',
+          showDenyButton: true,
+          confirmButtonText: 'Save',
+          denyButtonText: `Cancel`,
+      }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
+                  url: '<?= base_url('/Home_c/save_job_profile/') ?>',
                   type: "post",
                   data: form,
                   beforeSend: function() {
