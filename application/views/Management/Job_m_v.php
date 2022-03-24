@@ -134,6 +134,7 @@
     <div class="modal_edit"></div>
     <div class="modal_view"></div>
     <div class="modal_send_admin"></div>
+    <div class="modal_delegate"></div>
 
 </section>
 
@@ -411,6 +412,53 @@ function send_admin_modal() {
     });
 };
 
+function delegate_modal(data_) {
+    $('#modal_send_admin').modal('hide');
+    action = $(data_).attr('data');
+    
+    var val = {};
+    val.modal = 'MODAL DELEGATE JOB';
+    val.id = 'modal_delegate';
+    val.form_id = "form_" + val.id;
+    val.position = action;
+    val.tujuan = 'tujuan';
+    val.tugas = 'tugas';
+    val.kewenangan = 'kewenangan';
+    val.kompetensi = 'kompetensi';
+    val.kualifikasi = 'kualifikasi';
+    val.kpi = 'kpi';
+    $.ajax({
+        url: '<?= base_url('/Management/Job_m_c/delegate_modal/') ?>',
+        type: "post",
+        data: val,
+        success: function(res) {
+
+            $(".modal_delegate").html(res);
+            $('#modal_delegate').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modal_delegate').modal('show');
+            
+            $('#input-tingkat_pendidikan').change(function(){ 
+                // alert('tes');
+                // var value = $(this).val();
+                var value = $('#input-tingkat_pendidikan option:selected').text();
+                var val = {};
+                val.tingkat_pendidikan = value;
+                console.log(value)
+                $.post('<?php echo base_url()?>Management/Job_m_c/change_jurusan',val,function(data){ 
+                console.log(data);
+                    $('.jurusan').html(data);
+                });
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('gagal');
+        }
+    });
+};
+
 
 function action_submit(data_) {
     action = $(data_).attr('data');
@@ -465,6 +513,8 @@ function action_submit(data_) {
                             save(form);
                         } else if (action == 'kewenangan' || action == 'kompetensi' || action == 'kpi' || action == 'kualifikasi') {
                             save_multiple(form);
+                        }  else if(action == 'modal_delegate') {
+                            delegate(form)
                         }
                     } else {
                         $.each(data, function(key, value) {
@@ -533,9 +583,54 @@ function check_dropdown(data_) {
 
 function close_modal(data_) {
     action = $(data_).attr('data');
-    $("#" + action).remove();
+    if (action == 'delegate') {
+        $('#modal_send_admin').modal('show');
+    } else {
+        $("#" + action).remove();
+    }
 }
 
+
+function delegate(form) {
+    Swal.fire({
+        title: 'Do you want to save the changes?',
+        showDenyButton: true,
+        confirmButtonText: 'Save',
+        denyButtonText: `Cancel`,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '<?= base_url('Management/Job_m_c/delegate_/') ?>',
+                type: "post",
+                data: form,
+                beforeSend: function() {
+                    $("#loader").show();
+                },
+                complete: function() {
+                    $("#loader").hide();
+                },
+                success: function(res) {
+                    if (res == 'Berhasil di Simpan') {
+                        // $('#modal_edit').modal('hide');
+                        Swal.fire({
+                            title: 'Your has been saved.',
+                            icon: 'success',
+                        });
+
+                        setTimeout(function() {
+                            location.reload(true);
+                        }, 1000);
+                    } else {
+                        alert(res)
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('gagal');
+                }
+            });
+        }
+    })
+}
 
 function save(form) {
     Swal.fire({

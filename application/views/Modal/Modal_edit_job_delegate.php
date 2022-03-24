@@ -44,8 +44,8 @@
                                 ?>
                                 <button type="button" style="cursor: default;" class="btn btn-success btn-sm float-end">Sent to Admin</button>
                                 <?php } else { ?>
-                                    <button type="button" data="" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end" style="margin-left: 10px">Delegate to</button>
-                                <button type="button" data="modal_send_admin" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end">Send to Admin</button>
+                                    <button type="button" data="<?= $position ?>" onclick="delegate_modal(this)" class="btn btn-primary btn-sm float-end" style="margin-left: 10px">Delegate to</button>
+                                    <button type="button" data="modal_send_admin" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end">Send to Admin</button>
                             <?php  }?>
                         </form>
                     </div>

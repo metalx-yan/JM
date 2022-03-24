@@ -166,6 +166,98 @@ class Job_m_c extends CI_Controller {
         echo $msg;
     }
 
+    function delegate_modal(){
+        $table = 'job';
+        $table_posisi = 'posisi';
+        $table_listjob = 'list_jobs';
+        
+        $on1 = 'job_name';
+        $on2 = 'id_job';
+        $field_id = 'list_jobs.id';
+        $on3 = 'position_id';
+        $username = $_SESSION['username'];
+        $modal = $this->input->post('modal');
+        $position_id = $this->input->post('position');
+        // var_dump($position_id);die;
+        $id = $this->input->post('id');
+        
+        $query_search_delegate = "SELECT * from status_job_profile a inner join db_jrms.tb_user b on a.delegat_to = b.user_name inner join db_jrms.branch c on b.branch = c.id_branch";
+        $query_delegate = $this->db_jobmanagement->query($query_search_delegate)->row();
+
+        $data['id_job'] = $this->training_parameter->join_2_distinct(
+            $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
+            ,$field_id,$position_id,'list_jobs.id,job.id_job,job.job_title,posisi.position_name'
+        )->row();
+
+        $data['position'] = $position_id;
+        $data['modal_title'] = $modal;
+        $data['id'] = $id;
+        $data['username'] = $username;
+
+        $query = "SELECT user_name,nama,job_title,branch,b.singkatan from db_jrms.tb_user a
+        inner join db_jrms.branch b
+        on a.branch = b.id_branch where approval1 = '$username' and
+        status = 1 and job_title like '%head%'
+        UNION 
+        SELECT user_name,nama,job_title,branch,d.singkatan from db_jrms.tb_user c
+        inner join db_jrms.branch d
+        on c.branch = d.id_branch
+        where approval1 in (SELECT user_name from db_jrms.tb_user where approval1 = '$username' and
+        status = 1 and job_title like '%head%') and status = 1";
+
+        $data['delegate'] = $this->db_jobmanagement->query($query)->result_array();
+
+        $html_modal = $this->load->view('Modal/Modal_delegate',$data,TRUE);
+        echo $html_modal;
+    }
+
+    function delegate_()
+    {
+        $table = 'status_job_profile';
+        $field = 'id';
+        $save = '';
+      
+        foreach($_POST as $key => $val){
+            $data[$key] = $val;
+        }
+
+        $count = $this->training_parameter->where($data['id'],$table,'job_list_id')->num_rows();
+        if ($count > 0) {
+            $this->now;
+            $now = date('Y-m-d H:i:s');
+
+            $data_update = array(
+                'delegate_to' => $data['delegate'],
+                'updated_at' => $now
+            );
+            $update = $this->training_parameter->update($data['id'],$data_update,$table,'job_list_id');
+        } else {
+            # code...
+            $this->now;
+            $now = date('Y-m-d H:i:s');
+            $data_arr = array(
+                'job_list_id' => $data['id'],
+                'status' => NULL,
+                'created_at' => $now,
+            );
+            $save = $this->training_parameter->save_send($data_arr, 'status_job_profile');
+
+            $data_update = array(
+                'delegate_to' => $data['delegate'],
+                'updated_at' => $now
+            );
+            $update = $this->training_parameter->update($save,$data_update,$table,$field);
+        }
+        
+        if ($update == true) {
+            $msg = 'Berhasil di Simpan';
+        }else{
+            $msg = 'Gagal Menyimpan';
+        }
+
+        echo $msg;
+    }
+
     function send_admin_modal()
     {
         $table = 'job';
