@@ -17,7 +17,7 @@
                 </div>
                 <div class="card-body">
                     <form id="form_<?= $id ?>">
-
+                    <input type="hidden" name="id" value="<?= $position_id ?>">
                     <div class="mb-3 row">
                         <label class="col-sm-5 col-form-label">Kode Job</label>
                         <div class="col-sm-7 form-group">
@@ -41,7 +41,7 @@
                         <label class="col-sm-5 col-form-label">Delegate to</label>
                         <div class="col-sm-7 form-group">
                             <select onchange="check_v(this)" name="delegate" id="input-delegate" class="form-select form-select-sm delegate" aria-label=".form-select-sm example">
-                                <option value="<?= (( $query_delegate)? $query_delegate->job_title : '' )?>" selected><?php echo (( $query_delegate)? $id_job->job_title : '' ) ?></option>
+                                <option value="<?= (( $query_delegate)? $query_delegate->user_name : '' )?>" selected><?php echo (( $query_delegate)? $query_delegate->singkatan .' - '. $query_delegate->nama .' - '. $query_delegate->job_title : '' ) ?></option>
 
                                 <?php foreach($delegate as $delegate):?>
                                     <option value="<?= $delegate['user_name']?>"><?= $delegate['singkatan'].' - '?> <div style="font-weight: bold;"><?= $delegate['nama']?></div> <?=  ' - '.$delegate['job_title']?></option>
@@ -52,10 +52,19 @@
                     </div>
 
                     <div class="">
+                    <?php if ($status_job_profile == null) {?>
+                        <button type="button" data="modal_delegate" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end">Send</button>
 
-                            <input type="hidden" value="<?= $position ?>" name="id">
-                            
-                            <button type="button" data="modal_delegate" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end">Send</button>
+                    <?php  } else {?>
+                            <?php if ($status_job_profile->delegate_to != NULL) { ?>
+                                <button type="button" class="btn btn-warning btn-sm float-end" style="cursor:default;">Sent</button>
+                            <?php } else { ?>
+                                <input type="hidden" value="<?= $position ?>" name="id">
+                                
+                                <button type="button" data="modal_delegate" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end">Send</button>
+                            <?php } ?> 
+                    <?php } ?> 
+
                             
                     </div>
                     </form>

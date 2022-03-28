@@ -10,55 +10,8 @@
             <div id="error"></div>
           </div>
         </div>
+
         <div class="modal-body">
-            <div class="card">
-                <div class="card-header">
-                    Job Desc Info
-                </div>
-                <div class="card-body">
-                    <div class="mb-3 row">
-                        <label class="col-sm-5 col-form-label">Kode Job</label>
-                        <div class="col-sm-7 form-group">
-                            <select onchange="check_v(this)" name="id_job" id="input-id_job" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
-                                <option value="<?= (( $id_job)? $id_job->id_job : '' )?>" selected><?php echo (( $id_job)? $id_job->id_job : '' ) ?></option>
-                            </select>
-                        <span id="error"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label class="col-sm-5 col-form-label">Nama Job</label>
-                        <div class="col-sm-7 form-group">
-                            <select onchange="check_v(this)" name="job" id="input-job" class="form-select form-select-sm job" aria-label=".form-select-sm example">
-                                <option value="<?= (( $id_job)? $id_job->job_title : '' )?>" selected><?php echo (( $id_job)? $id_job->job_title : '' ) ?></option>
-                            </select>
-                            <span id="error"></span>
-                        </div>
-                    </div>
-                    <div class="">
-                        <form id="form_<?= $id ?>">
-
-                            <input type="hidden" value="<?= $position ?>" name="id">
-                            
-                            <?php if ($cek_send_admin == 1) {
-                                ?>
-                                    <button type="button" style="cursor: default;" class="btn btn-success btn-sm float-end">Sent to Admin</button>
-                                <?php } else { ?>
-                                    <button type="button" data="<?= $position ?>" onclick="delegate_modal(this)" class="btn btn-primary btn-sm float-end" style="margin-left: 10px">Delegate to</button>
-                                    <button type="button" data="modal_send_admin" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end">Send to Admin</button>
-
-                                    <?php if ($status_job_profile == null) {?>
-                                        <?php  } else {?>
-                                            <?php if ($status_job_profile->status != null) {?>
-                                                <button type="button" class="btn btn-success btn-sm float-end" style="margin-right: 10px;cursor:default;">Data Updated</button>
-                                            <?php }  ?>
-                                    <?php  }?>
-                            <?php  }?>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <br>
             <div class="card">
                 <div class="card-header">
                     Job Desc Detail
@@ -98,8 +51,10 @@
                                 <span id="error"></span>
                                 </div>
                             </div>
-
-                            <button type="button" data="<?= $tujuan ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="action_submit(this)"' ?> class="btn btn-warning float-end btn_save_<?= $tujuan ?>">SAVE</button>
+                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php } else { ?>
+                                <button type="button" data="<?= $tujuan ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $tujuan ?>" >SAVE</button>
+                            <?php } ?> 
                         </form>
                         </div>
                         <div class="tab-pane fade" id="tugas">
@@ -149,19 +104,21 @@
                                                 <div class="input-group mb-3">
                                                     <input type="text" name="field_<?= $tugas ?>[]" class="form-control form-control-sm m-input enter_<?= $tugas?>" value="<?= $data_desc_tugas_tanggung_jawab['description'] ?>" placeholder="" autocomplete="off">
                                                     <div class="input-group-append">
-                                                        <button id="removeRow_<?= $tugas ?>" data="<?= $tugas ?>"  <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="dels(this)"' ?>  type="button" class="btn btn-danger btn-sm">Remove</button>
+                                                        <button id="removeRow_<?= $tugas ?>" data="<?= $tugas ?>" onclick="dels(this)" type="button" class="btn btn-danger btn-sm" >Remove</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
 
                                         <div id="newRow_<?= $tugas ?>"></div>
-                                        <button id="addRow_<?= $tugas ?>" data="<?= $tugas ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="tabs(this)"' ?>  type="button" class="btn btn-primary btn-sm">Add Row</button>
+                                        <button id="addRow_<?= $tugas ?>" data="<?= $tugas ?>" onclick="tabs(this)" type="button" class="btn btn-primary btn-sm" >Add Row</button>
                                     <span id="error"></span>
                                 </div>
                             </div>
-
-                            <button type="button" data="<?= $tugas ?>" <?= $cek_send_admin == 1 ? 'disabled"' : 'onclick="action_submit(this)"' ?>  class="btn btn-warning float-end btn_save_<?= $tugas ?>">SAVE</button>
+                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php } else { ?>
+                                <button type="button" data="<?= $tugas ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $tugas ?>" >SAVE</button>
+                            <?php } ?> 
                             
                         </form>
 
@@ -189,19 +146,21 @@
                                                 <input type="text" name="field_<?= $kewenangan ?>[]"  value="<?= $data_kewenangan['kewenangan'] ?>" id="input-field_<?= $kewenangan ?>" class="form-control form-control-sm m-input enter_<?= $kewenangan?>"  autocomplete="off">
                                                 <!-- <input type="hidden" name="hidden_<?= $kewenangan ?>[]"  value="<?= $data_kewenangan['id_kewenangan'] ?>" id="input-field_<?= $kewenangan ?>" class="form-control form-control-sm m-input enter_<?= $kewenangan?>"  autocomplete="off"> -->
                                                 <div class="input-group-append">
-                                                    <button id="removeRow_<?= $kewenangan ?>" data="<?= $kewenangan ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="dels(this)"' ?>  type="button" class="btn btn-danger btn-sm">Remove</button>
+                                                    <button id="removeRow_<?= $kewenangan ?>" data="<?= $kewenangan ?>" onclick="dels(this)" type="button" class="btn btn-danger btn-sm" >Remove</button>
                                                 </div>
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
 
                                         <div id="newRow_<?= $kewenangan ?>"></div>
-                                        <button id="addRow_<?= $kewenangan ?>"  data="<?= $kewenangan ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="tabs(this)"' ?>  type="button" class="btn btn-primary btn-sm">Add Row</button>
+                                        <button id="addRow_<?= $kewenangan ?>"  data="<?= $kewenangan ?>" onclick="tabs(this)" type="button" class="btn btn-primary btn-sm" >Add Row</button>
                                     <span id="error"></span>
                                 </div>
                             </div>
-
-                            <button type="button" disabled data="<?= $kewenangan ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="action_submit(this)"' ?>  class="btn btn-warning float-end btn_save_<?= $kewenangan ?>">SAVE</button>
+                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php } else { ?>
+                                <button type="button"  data="<?= $kewenangan ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $kewenangan ?>" >SAVE</button>
+                            <?php } ?> 
                             
                         </form>
                         </div>
@@ -252,7 +211,7 @@
                                         <span id="error"></span>
                                     </div>
                                     <div class="col-md-3 d-flex align-content-end flex-wrap">
-                                        <button id="removeRow_<?= $kualifikasi ?>" data="<?= $kualifikasi ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="dels(this)"' ?> type="button" class="btn btn-danger btn-sm">Remove</button>
+                                        <button id="removeRow_<?= $kualifikasi ?>" data="<?= $kualifikasi ?>" onclick="dels(this)" type="button" class="btn btn-danger btn-sm" >Remove</button>
                                     </div>
 
                                 </div>
@@ -261,20 +220,23 @@
 
                             <div id="newRow_<?= $kualifikasi ?>"></div>
                             <br>
-                            <button id="addRow_<?= $kualifikasi ?>" data="<?= $kualifikasi ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="tabs(this)"' ?>  type="button" class="btn btn-primary btn-sm">Add Row</button>
+                            <button id="addRow_<?= $kualifikasi ?>" data="<?= $kualifikasi ?>" onclick="tabs(this)" type="button" class="btn btn-primary btn-sm" >Add Row</button>
                             <br>
                             <label class="col-sm-5 col-form-label">Pengalaman Kerja</label>
                             <?php foreach($work_experience as $work):?>
                                 
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <input type="checkbox" name="description[]" <?= $cek_send_admin == 1 ? 'disabled' : '' ?> value="<?=  $work['id']?>" <?= (in_array($work['id'], $data_description)) ? 'checked' : ''?>>  <?= $work['description']?>
+                                        <input type="checkbox" name="description[]" value="<?=  $work['id']?>" <?= (in_array($work['id'], $data_description)) ? 'checked' : ''?>  >  <?= $work['description']?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
 
                             <br>
-                            <button type="button" disabled data="<?= $kualifikasi ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="action_submit(this)"' ?>  class="btn btn-warning float-end btn_save_<?= $kualifikasi ?>">SAVE</button>
+                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php } else { ?>
+                                <button type="button"  data="<?= $kualifikasi ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $kualifikasi ?>" >SAVE</button>
+                            <?php } ?> 
                             
                         </form>
                         </div>
@@ -300,19 +262,23 @@
                                                 <div class="input-group mb-3">
                                                     <input type="text" name="field_<?= $kompetensi ?>[]"  value="<?= $data_kompetensi['kompetensi'] ?>" class="form-control form-control-sm m-input enter_<?= $kompetensi?>" placeholder="" autocomplete="off">
                                                     <div class="input-group-append">
-                                                        <button id="removeRow_<?= $kompetensi ?>" data="<?= $kompetensi ?>" <?= $cek_send_admin == 1 ? 'disabled' : ' onclick="dels(this)"' ?>  type="button" class="btn btn-danger btn-sm">Remove</button>
+                                                        <button id="removeRow_<?= $kompetensi ?>" data="<?= $kompetensi ?>" onclick="dels(this)" type="button" class="btn btn-danger btn-sm" >Remove</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
 
                                         <div id="newRow_<?= $kompetensi ?>"></div>
-                                        <button id="addRow_<?= $kompetensi ?>" data="<?= $kompetensi ?>" <?= $cek_send_admin == 1 ? 'disabled' : ' onclick="tabs(this)"' ?>  type="button" class="btn btn-primary btn-sm">Add Row</button>
+                                        <button id="addRow_<?= $kompetensi ?>" data="<?= $kompetensi ?>" onclick="tabs(this)" type="button" class="btn btn-primary btn-sm" >Add Row</button>
                                     <span id="error"></span>
                                 </div>
                             </div>
+                            
+                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php } else { ?>
+                                <button type="button"  data="<?= $kompetensi ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $kompetensi ?>" >SAVE</button>
+                            <?php } ?> 
 
-                            <button type="button" disabled data="<?= $kompetensi ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="action_submit(this)"' ?>  class="btn btn-warning float-end btn_save_<?= $kompetensi ?>">SAVE</button>
                             
                         </form>
                         </div>
@@ -338,19 +304,21 @@
                                                 <div class="input-group mb-3">
                                                     <input type="text" name="field_<?= $kpi ?>[]"  value="<?= $data_kpi['kpi'] ?>" class="form-control form-control-sm m-input enter_<?= $kpi?>" placeholder="" autocomplete="off">
                                                     <div class="input-group-append">
-                                                        <button id="removeRow_<?= $kpi ?>" type="button" data="<?= $kpi ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="dels(this)"' ?>  class="btn btn-danger btn-sm">Remove</button>
+                                                        <button id="removeRow_<?= $kpi ?>" type="button" data="<?= $kpi ?>" onclick="dels(this)" class="btn btn-danger btn-sm">Remove</button>
                                                     </div>
                                                 </div>
                                         </div>
                                         <?php endforeach; ?>
 
                                         <div id="newRow_<?= $kpi ?>"></div>
-                                        <button id="addRow_<?= $kpi ?>" data="<?= $kpi ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="tabs(this)"' ?>   type="button" class="btn btn-primary btn-sm">Add Row</button>
+                                        <button id="addRow_<?= $kpi ?>" data="<?= $kpi ?>" onclick="tabs(this)" type="button" class="btn btn-primary btn-sm" >Add Row</button>
                                     <span id="error"></span>
                                 </div>
                             </div>
-
-                            <button type="button" disabled data="<?= $kpi ?>" <?= $cek_send_admin == 1 ? 'disabled' : 'onclick="action_submit(this)"' ?>   class="btn btn-warning float-end btn_save_<?= $kpi ?>">SAVE</button>
+                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php } else { ?>
+                                <button type="button"  data="<?= $kpi ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $kpi ?>" >SAVE</button>
+                            <?php } ?> 
                             
                         </form>
                         </div>
@@ -358,7 +326,15 @@
                 </div>
                 </div>
             </div>
-            
+            <br>
+            <?php if ($status_job_profile->status == '3') { ?>
+                <button class="btn btn-success btn-sm float-end" style="cursor:default;">Sent to PUK Tertinggi</button>
+            <?php } else { ?>
+                <form id="form_delegate_individu">
+                    <input type="hidden" value="<?= $position_id ?>" name="position_id">
+                    <button type="button" data="delegate_individu" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end">Send to PUK Tertinggi</button>
+                </form>
+            <?php } ?> 
         </div>
        
     </div>

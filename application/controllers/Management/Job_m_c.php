@@ -148,16 +148,23 @@ class Job_m_c extends CI_Controller {
         foreach($_POST as $key => $val){
             $data[$key] = $val;
         }
-
-        $data_job = $this->training_parameter->where($data['id'],'list_jobs','id')->row();
-        $now = date('Y-m-d H:i:s');
-        $data_arr = array(
-            'job_list_id' => $data_job->id,
-            'status' => 0,
-            'created_at' => $now,
-        );
         
-        $save = $this->training_parameter->save($data_arr, 'status_job_profile');
+        $search = $this->training_parameter->where($data['id'],'status_job_profile','job_list_id')->num_rows();
+        if ($search > 0) {
+            $data_update = ['status' => 0];
+            $save = $this->training_parameter->update($data['id'],$data_update,'status_job_profile','job_list_id');
+        } else {
+            $data_job = $this->training_parameter->where($data['id'],'list_jobs','id')->row();
+            $now = date('Y-m-d H:i:s');
+            $data_arr = array(
+                'job_list_id' => $data_job->id,
+                'status' => 0,
+                'created_at' => $now,
+            );
+            
+            $save = $this->training_parameter->save($data_arr, 'status_job_profile');
+        }
+        
         if ($save == true) {
             $msg = 'Berhasil di Simpan';
         }else{
@@ -181,9 +188,9 @@ class Job_m_c extends CI_Controller {
         // var_dump($position_id);die;
         $id = $this->input->post('id');
         
-        $query_search_delegate = "SELECT * from status_job_profile a inner join db_jrms.tb_user b on a.delegat_to = b.user_name inner join db_jrms.branch c on b.branch = c.id_branch";
+        $query_search_delegate = "SELECT * from status_job_profile a inner join db_jrms.tb_user b on a.delegate_to = b.user_name inner join db_jrms.branch c on b.branch = c.id_branch";
         $query_delegate = $this->db_jobmanagement->query($query_search_delegate)->row();
-
+        // var_dump($query_delegate);die;
         $data['id_job'] = $this->training_parameter->join_2_distinct(
             $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
             ,$field_id,$position_id,'list_jobs.id,job.id_job,job.job_title,posisi.position_name'
@@ -205,8 +212,11 @@ class Job_m_c extends CI_Controller {
         where approval1 in (SELECT user_name from db_jrms.tb_user where approval1 = '$username' and
         status = 1 and job_title like '%head%') and status = 1";
 
+        $data['status_job_profile'] = $this->training_parameter->where($position_id,'status_job_profile','job_list_id')->row();
+        
+        $data['position_id'] = $position_id;
         $data['delegate'] = $this->db_jobmanagement->query($query)->result_array();
-
+        $data['query_delegate'] = $query_delegate;
         $html_modal = $this->load->view('Modal/Modal_delegate',$data,TRUE);
         echo $html_modal;
     }
@@ -222,6 +232,7 @@ class Job_m_c extends CI_Controller {
         }
 
         $count = $this->training_parameter->where($data['id'],$table,'job_list_id')->num_rows();
+        // var_dump($data);die;
         if ($count > 0) {
             $this->now;
             $now = date('Y-m-d H:i:s');
@@ -232,7 +243,7 @@ class Job_m_c extends CI_Controller {
             );
             $update = $this->training_parameter->update($data['id'],$data_update,$table,'job_list_id');
         } else {
-            # code...
+        //     # code...
             $this->now;
             $now = date('Y-m-d H:i:s');
             $data_arr = array(
@@ -358,8 +369,9 @@ class Job_m_c extends CI_Controller {
         }
 
         $data['data_description'] = $data_kual;
+        $data['status_job_profile'] = $this->training_parameter->where($position_id,'status_job_profile','job_list_id')->row();
         
-        // var_dump($data['data_description']);die;
+        // var_dump($data['status_job_profile']);die;
         $data['position'] = $position_id;
         $data['modal_title'] = $modal;
         $data['id'] = $id;
