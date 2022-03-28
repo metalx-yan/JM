@@ -385,6 +385,18 @@ class Job_m_c extends CI_Controller {
         echo $html_modal;
     }
 
+    function mapping_job()
+    {
+        $modal = $this->input->post('modal');
+        $position_id = $this->input->post('position');
+        $id = $this->input->post('id');
+        $data['position'] = $position_id;
+        $data['modal_title'] = $modal;
+        $data['id'] = $id;
+        $html_modal = $this->load->view('Modal/Modal_mapping',$data,TRUE);
+        echo $html_modal;
+    }
+
     function save_(){
         $table = 'tujuan_jabatan';
         $field = 'id';

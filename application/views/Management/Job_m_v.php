@@ -135,6 +135,7 @@
     <div class="modal_view"></div>
     <div class="modal_send_admin"></div>
     <div class="modal_delegate"></div>
+    <div class="modal_mapping"></div>
 
 </section>
 
@@ -202,9 +203,10 @@ function search(form) {
                         "sortable": false,
                         render: function(data, type, row, meta) {
                             if (data.status == 'Admin') {
+                                mappings = '<button class="btn btn-secondary m-3" value="'+data.id+'" onclick="mapping_modal()">Mapping</button>'
                                 adds = '<button class="btn btn-primary m-3" value="'+data.id+'" onclick="view_modal()">View</button>'
                                 views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="send_admin_modal()">Edit</button>'
-                                return adds + views
+                                return mappings + adds + views
                                 
                             } else {
                                 adds = '<button class="btn btn-primary m-3" disabled >View</button>'
@@ -319,6 +321,32 @@ function view_modal() {
                 keyboard: false
             });
             $('#modal_view').modal('show');
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('gagal');
+        }
+    });
+};
+
+function mapping_modal() {
+    var val = {};
+    val.modal = 'MODAL MAPPING JOB';
+    val.id = 'modal_mapping';
+    val.form_id = "form_" + val.id;
+    val.job = event.target.value;
+    console.log(val);
+ 
+    $.ajax({
+        url: '<?= base_url('Management/Job_m_c/mapping_job/') ?>',
+        type: "POST",
+        data: val,
+        success: function(res) {
+            $(".modal_mapping").html(res);
+            $('#modal_mapping').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modal_mapping').modal('show');
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert('gagal');
