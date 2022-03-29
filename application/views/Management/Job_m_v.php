@@ -203,7 +203,11 @@ function search(form) {
                         "sortable": false,
                         render: function(data, type, row, meta) {
                             if (data.status == 'Admin') {
-                                mappings = '<button class="btn btn-secondary m-3" value="'+data.id+'" onclick="mapping_modal()">Mapping</button>'
+                                if (data.status_awal == '1' && data.status_akhir == '1') {
+                                    mappings = '<button class="btn btn-secondary m-3" value="'+data.id+'" onclick="mapping_modal()">Mapping</button>'
+                                } else {
+                                    mappings = ''
+                                }
                                 adds = '<button class="btn btn-primary m-3" value="'+data.id+'" onclick="view_modal()">View</button>'
                                 views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="send_admin_modal()">Edit</button>'
                                 return mappings + adds + views
@@ -297,6 +301,25 @@ function search(form) {
 //         }
 //     });
 // };
+function render() {
+    name = $("#input-mapping").val();
+    job = $("#job_title").val();
+    position = $("#position_name").val();
+    arr = name.split("-");
+    $('#nama_value').html(arr[0]);
+    $('#position_value').html(job);
+    $('#job_value').html(position);
+
+    if (arr[0] == '') {
+        
+        $('.btn-mapping').prop('disabled', true)
+    } else {
+        $('.btn-mapping').prop('disabled', false)
+
+    }
+    // console.log(myArray)
+    // $("preview").innerHTML = html;
+}
 
 function view_modal() {
     var val = {};
@@ -334,8 +357,6 @@ function mapping_modal() {
     val.id = 'modal_mapping';
     val.form_id = "form_" + val.id;
     val.job = event.target.value;
-    console.log(val);
- 
     $.ajax({
         url: '<?= base_url('Management/Job_m_c/mapping_job/') ?>',
         type: "POST",
@@ -499,7 +520,7 @@ function action_submit(data_) {
         delete_();
     } else {
         console.log(action)
-        if (action == 'kualifikasi'  || action == 'tugas' || action == 'modal_send_admin') {
+        if (action == 'kualifikasi'  || action == 'tugas' || action == 'modal_send_admin' || action == 'mapping') {
             $.ajax({
                 type: "POST",
                 url: "<?php echo site_url('Management/Job_m_c/validate_kual'); ?>",
@@ -509,6 +530,8 @@ function action_submit(data_) {
                     if (data.action == 'ok') {
                         if (action == 'modal_send_admin') {
                             send(form)
+                        } else if (action == 'mapping') {
+                            mapping(form)
                         } else {
                             save_multiple(form);
                         }
@@ -618,6 +641,46 @@ function close_modal(data_) {
     }
 }
 
+function mapping(form) {
+    Swal.fire({
+        title: 'Do you want to save the changes?',
+        showDenyButton: true,
+        confirmButtonText: 'Save',
+        denyButtonText: `Cancel`,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '<?= base_url('Management/Job_m_c/mapping_/') ?>',
+                type: "post",
+                data: form,
+                beforeSend: function() {
+                    $("#loader").show();
+                },
+                complete: function() {
+                    $("#loader").hide();
+                },
+                success: function(res) {
+                    if (res == 'Berhasil di Simpan') {
+                        // $('#modal_edit').modal('hide');
+                        Swal.fire({
+                            title: 'Your has been saved.',
+                            icon: 'success',
+                        });
+
+                        setTimeout(function() {
+                            location.reload(true);
+                        }, 1000);
+                    } else {
+                        alert(res)
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('gagal');
+                }
+            });
+        }
+    })
+}
 
 function delegate(form) {
     Swal.fire({

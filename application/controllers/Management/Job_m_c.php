@@ -119,7 +119,7 @@ class Job_m_c extends CI_Controller {
         $query = "SELECT distinct a.id,b.position_id, b.position_name,c.job_title,CASE
         WHEN d.status = 0 THEN 'Belum Ada'
         WHEN d.status = 1 THEN 'Admin'
-        END status 
+        END status , d.status status_awal, e.status status_akhir
         from list_jobs a
         inner join posisi b
         on a.position_id = b.position_id
@@ -127,6 +127,8 @@ class Job_m_c extends CI_Controller {
         on a.job_name = c.id_job
         left join status_job d
         on a.id = d.job_list_id 
+        left join status_job_profile e
+        on a.id = e.job_list_id
         where position_name in (select distinct position_name from posisi where org_group = '$data_singkatan->singkatan') and a.id = d.job_list_id $where";
 
         $data = $this->db_jobmanagement->query($query)->result_array();
@@ -385,14 +387,68 @@ class Job_m_c extends CI_Controller {
         echo $html_modal;
     }
 
+    function mapping_(){
+        foreach($_POST as $key => $val){
+            $data[$key] = $val;
+        }
+        // var_dump($data);die;
+        $this->now;
+        $now = date('Y-m-d H:i:s');
+        $map = explode('-',$data['mapping']);
+        $array = ['user_name' => $map[1], 'job_list_id' => $data['job'], 'mapping_by' => $data['mapping_to'], 'created_at' => $now];
+        $save = $this->training_parameter->save($array,'mapping_job');
+          
+        if ($save == true) {
+            $msg = 'Berhasil di Simpan';
+        }else{
+            $msg = 'Gagal Menyimpan';
+        }
+
+        echo $msg;
+    }
+
     function mapping_job()
     {
         $modal = $this->input->post('modal');
-        $position_id = $this->input->post('position');
+        $job_id = $this->input->post('job');
         $id = $this->input->post('id');
-        $data['position'] = $position_id;
+        $data['job'] = $job_id;
         $data['modal_title'] = $modal;
         $data['id'] = $id;
+        $username = $_SESSION['username'];
+        // var_dump($data['job']);die;
+
+        $query_job = "SELECT distinct a.id,a.position_id, b.position_name,c.id_job,c.job_title from list_jobs a
+        join posisi b
+        on a.position_id = b.position_id
+        join job c
+        on a.job_name = c.id_job
+        where a.id = '$job_id'";
+
+        $query_name = "SELECT user_name,nama,job_title,branch,b.singkatan from db_jrms.tb_user a
+        inner join db_jrms.branch b
+        on a.branch = b.id_branch where approval1 = '$username' and
+        status = 1 and job_title like '%head%'
+        UNION 
+        SELECT user_name,nama,job_title,branch,d.singkatan from db_jrms.tb_user c
+        inner join db_jrms.branch d
+        on c.branch = d.id_branch
+        where approval1 in (SELECT user_name from db_jrms.tb_user where approval1 = '$username' and
+        status = 1 and job_title like '%head%') and status = 1";
+
+        $query_get = "SELECT a.user_name,b.nama,b.job_title, c.singkatan from mapping_job a
+        inner join db_jrms.tb_user b
+        on a.user_name = b.user_name
+        inner join db_jrms.branch c
+        on b.branch = c.id_branch
+        where a.job_list_id = '$job_id'";
+
+        $data['mapping_to'] = $username;
+        $data['job_position'] = $this->db_jobmanagement->query($query_job)->row();
+        $data['id_job'] = $this->db_jobmanagement->query($query_get)->row();
+        $data['people'] = $this->db_jobmanagement->query($query_name)->result_array();
+        $data['user_onjob'] = $this->training_parameter->get_('mapping_job')->result_array();
+
         $html_modal = $this->load->view('Modal/Modal_mapping',$data,TRUE);
         echo $html_modal;
     }
