@@ -200,6 +200,10 @@ class training_parameter extends CI_Model {
         return $this->db_jobmanagement->get($table);
     }
 
+    function gets($table){
+        return $this->db_jobmanagement->distinct()->get($table);
+    }
+
     function get_select_max($table,$select){
         $this->db_jobmanagement->select("$select");
         return $this->db_jobmanagement->get($table);

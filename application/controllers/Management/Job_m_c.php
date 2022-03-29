@@ -447,7 +447,7 @@ class Job_m_c extends CI_Controller {
         $data['job_position'] = $this->db_jobmanagement->query($query_job)->row();
         $data['id_job'] = $this->db_jobmanagement->query($query_get)->row();
         $data['people'] = $this->db_jobmanagement->query($query_name)->result_array();
-        $data['user_onjob'] = $this->training_parameter->get_('mapping_job')->result_array();
+        $data['user_onjob'] = $this->training_parameter->gets('mapping_job')->result_array();
 
         $html_modal = $this->load->view('Modal/Modal_mapping',$data,TRUE);
         echo $html_modal;
