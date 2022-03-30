@@ -126,6 +126,73 @@
                     </div>
                     
                   </div>
+                  <?php } else if($jabatan == '102') {?>
+                    <div class="card">
+                    <div class="card-header">
+                      Search
+                    </div>
+                    <form id="form_search">
+
+                      <div class="card-body">
+                            <div class="mb-3 row">
+                              <label class="col-sm-5 col-form-label">Direktorat</label>
+                              <div class="col-sm-7 form-group">
+                              <select onchange="check_v(this)" name="direktorat" id="input-direktorat" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                                <option value="" selected></option>
+                                <?php foreach($direktorat as $direktorat):?>
+                                    <option value="<?= $direktorat['id_dir']?>"><?= $direktorat['dir_group_name']; ?></option>
+                                <?php endforeach; ?>
+                              </select>
+                              <span id="error"></span>
+                              </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                              <label class="col-sm-5 col-form-label">Organisasi</label>
+                              <div class="col-sm-7 form-group">
+                              <select onchange="check_v(this)" name="organisasi" id="input-organisasi" class="form-select form-select-sm organisasi" aria-label=".form-select-sm example">
+                                <option value="" selected></option>
+                              </select>
+                              <span id="error"></span>
+                              </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                              <label class="col-sm-5 col-form-label">Posisi</label>
+                              <div class="col-sm-7 form-group">
+                              <select onchange="check_v(this)" name="posisi" id="input-posisi" class="form-select form-select-sm posisi" aria-label=".form-select-sm example">
+                                <option value="" selected></option>
+                              </select>
+                              <span id="error"></span>
+                              </div>
+                            </div>
+
+                              <button type="button" data="search" onclick="subsearch(this)" class="btn btn-warning float-end">Search</button>
+                              <br>
+                      </div>
+                      </form>
+                  </div>
+                  <br>
+                  <div class="card">
+                    <div class="card-header">
+                      List Job
+                    </div>
+                    <div class="card-body">
+                      <table id="manage_menu_sec" class="table table-bordered table-striped text-center align-middle" width="100%">
+                        <thead>
+                            <tr class="text-center">
+                                <th>No</th>
+                                <th>Kode Posisi</th>
+                                <th>Nama Posisi</th>
+                                <th>Nama Job</th>
+                                <th>Action</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                      </table>
+                    </div>
+                    
+                  </div>
                 <?php } ?>
             </div>
         </div>

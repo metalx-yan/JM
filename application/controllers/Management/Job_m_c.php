@@ -487,6 +487,7 @@ class Job_m_c extends CI_Controller {
         echo $msg;
     }
 
+
     function save_multiple_(){
         foreach($_POST as $key => $val){
             $data[$key] = $val;

@@ -86,6 +86,7 @@
     </div>
   </div>
   <div class="modal_view"></div>
+  <div class="modal_read"></div>
   <div class="modal_review"></div>
   <div class="modal_delegate"></div>
   </section>
@@ -174,6 +175,9 @@
                         // }
                       } else if (data.role == '101') {
                         views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="review_modal()">View</button>'
+                        return views 
+                      } else if (data.role != '101' && data.role != '100'  && data.role != '102' && data.mapping_by != null) {
+                        views = '<button id="btn-reads" value="'+data.id+'" class="btn btn-warning m-3" onclick="read_modal()">Read</button>'
                         return views 
                       } else {
                         views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="delegate_modal()">Edit</button>'
@@ -346,6 +350,36 @@
         $("#" + action).remove();
     }
 
+    function read_modal() {
+        var val = {};
+        val.modal = 'MODAL READ JOB';
+        val.id = 'modal_read';
+        val.form_id = "form_" + val.id;
+        val.job = event.target.value;
+        console.log(val);
+        val.tujuan = 'tujuan';
+        val.tugas = 'tugas';
+        val.kewenangan = 'kewenangan';
+        val.kompetensi = 'kompetensi';
+        val.kualifikasi = 'kualifikasi';
+        $.ajax({
+            url: '<?= base_url('Home_c/read_job/') ?>',
+            type: "POST",
+            data: val,
+            success: function(res) {
+                $(".modal_read").html(res);
+                $('#modal_read').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                $('#modal_read').modal('show');
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert('gagal');
+            }
+        });
+    };
+
     function view_modal() {
         var val = {};
         val.modal = 'MODAL VIEW JOB';
@@ -380,7 +414,7 @@
       $('#error').html(" ");
       formo = $("#form_" + action).serialize();
       console.log(formo)
-      if (action == 'kualifikasi'  || action == 'tugas' || action == 'modal_send_admin' || action == 'tujuan' || action == 'kewenangan' || action == 'kompetensi' || action == 'kpi' || action == 'kualifikasi' || action == 'delegate_individu') {
+      if (action == 'kualifikasi'  || action == 'tugas' || action == 'modal_send_admin' || action == 'tujuan' || action == 'kewenangan' || action == 'kompetensi' || action == 'kpi' || action == 'kualifikasi' || action == 'delegate_individu' || action == 'read') {
             $.ajax({
                 type: "POST",
                 url: "<?php echo site_url('Management/Job_m_c/validate_kual'); ?>",
@@ -397,6 +431,8 @@
                             saving(formo);
                         }  else if (action == 'delegate_individu') {
                             delegate_individu_to_admin(formo);
+                        } else if (action == 'read') {
+                            read_job(formo);
                         } else {
                             save_multiple(formo);
                         }
@@ -601,6 +637,54 @@ function delegate_individu_to_admin(form) {
           if (result.isConfirmed) {
               $.ajax({
                   url: '<?= base_url('/Home_c/save/') ?>',
+                  type: "post",
+                  data: form,
+                  beforeSend: function() {
+                      $("#loader").show();
+                  },
+                  complete: function() {
+                      $("#loader").hide();
+                  },
+                  success: function(res) {
+                      if (res == 'Berhasil di Simpan') {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: 'Your has been saved.',
+                              icon: 'success',
+                          });
+
+                          setTimeout(function() {
+                              location.reload(true);
+                          }, 1000);
+                      } else {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: res,
+                              icon: 'error',
+                          });
+
+                        
+                      }
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) {
+                      alert('gagal');
+                  }
+              });
+          }
+      })
+  }
+
+  function read_job(form) {
+      console.log(form);
+      Swal.fire({
+          title: 'Do you want to save the changes?',
+          showDenyButton: true,
+          confirmButtonText: 'Save',
+          denyButtonText: `Cancel`,
+      }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
+                  url: '<?= base_url('/Home_c/read_save/') ?>',
                   type: "post",
                   data: form,
                   beforeSend: function() {
