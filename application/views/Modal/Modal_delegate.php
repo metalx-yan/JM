@@ -43,8 +43,13 @@
                             <select onchange="check_v(this)" name="delegate" id="input-delegate" class="form-select form-select-sm delegate" aria-label=".form-select-sm example">
                                 <option value="<?= (( $query_delegate)? $query_delegate->user_name : '' )?>" selected><?php echo (( $query_delegate)? $query_delegate->singkatan .' - '. $query_delegate->nama .' - '. $query_delegate->job_title : '' ) ?></option>
 
-                                <?php foreach($delegate as $delegate):?>
-                                    <option value="<?= $delegate['user_name']?>"><?= $delegate['singkatan'].' - '?> <div style="font-weight: bold;"><?= $delegate['nama']?></div> <?=  ' - '.$delegate['job_title']?></option>
+                                <?php foreach($is_admin as $admin):?>
+                                    <?php foreach($delegate as $delegate):?>
+                                        <?php if ($admin['user_name'] == $delegate['user_name']) { ?>
+                                        <?php }  else { ?> 
+                                            <option value="<?= $delegate['user_name']?>"><?= $delegate['singkatan'].' - '?> <div style="font-weight: bold;"><?= $delegate['nama']?></div> <?=  ' - '.$delegate['job_title']?></option>
+                                        <?php } ?> 
+                                    <?php endforeach; ?>
                                 <?php endforeach; ?>
                             </select>
                             <span id="error"></span>

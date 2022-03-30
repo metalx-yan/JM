@@ -115,6 +115,9 @@
             if(data.status == '1' && data.status_akhir == null){
               $(row).find('td:eq(0)').css('background-color', 'rgb(88 183 165)').css('color', 'white');
             }
+            if(data.status == '1' && data.status_akhir == '3'){
+              $(row).find('td:eq(0)').css('background-color', 'rgb(88 183 165)').css('color', 'white');
+            }
             if(data.status == '1' && data.status_akhir == 0){
               $(row).find('td:eq(0)').css('background-color', '#cad92e').css('color', 'white');
             }

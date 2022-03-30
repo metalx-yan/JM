@@ -51,7 +51,7 @@
                                 <span id="error"></span>
                                 </div>
                             </div>
-                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php if ($status_job_profile->status == '3' || $status_job_profile->status == '0' || $status_job_profile->status == '1') { ?>
                             <?php } else { ?>
                                 <button type="button" data="<?= $tujuan ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $tujuan ?>" >SAVE</button>
                             <?php } ?> 
@@ -115,7 +115,7 @@
                                     <span id="error"></span>
                                 </div>
                             </div>
-                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php if ($status_job_profile->status == '3' || $status_job_profile->status == '0' || $status_job_profile->status == '1') { ?>
                             <?php } else { ?>
                                 <button type="button" data="<?= $tugas ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $tugas ?>" >SAVE</button>
                             <?php } ?> 
@@ -157,7 +157,7 @@
                                     <span id="error"></span>
                                 </div>
                             </div>
-                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php if ($status_job_profile->status == '3' || $status_job_profile->status == '0' || $status_job_profile->status == '1') { ?>
                             <?php } else { ?>
                                 <button type="button"  data="<?= $kewenangan ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $kewenangan ?>" >SAVE</button>
                             <?php } ?> 
@@ -233,7 +233,7 @@
                             <?php endforeach; ?>
 
                             <br>
-                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php if ($status_job_profile->status == '3' || $status_job_profile->status == '0' || $status_job_profile->status == '1') { ?>
                             <?php } else { ?>
                                 <button type="button"  data="<?= $kualifikasi ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $kualifikasi ?>" >SAVE</button>
                             <?php } ?> 
@@ -274,7 +274,7 @@
                                 </div>
                             </div>
                             
-                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php if ($status_job_profile->status == '3' || $status_job_profile->status == '0' || $status_job_profile->status == '1') { ?>
                             <?php } else { ?>
                                 <button type="button"  data="<?= $kompetensi ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $kompetensi ?>" >SAVE</button>
                             <?php } ?> 
@@ -315,7 +315,7 @@
                                     <span id="error"></span>
                                 </div>
                             </div>
-                            <?php if ($status_job_profile->status == '3') { ?>
+                            <?php if ($status_job_profile->status == '3' || $status_job_profile->status == '0' || $status_job_profile->status == '1') { ?>
                             <?php } else { ?>
                                 <button type="button"  data="<?= $kpi ?>" onclick="action_submit(this)" class="btn btn-warning float-end btn_save_<?= $kpi ?>" >SAVE</button>
                             <?php } ?> 
@@ -327,7 +327,7 @@
                 </div>
             </div>
             <br>
-            <?php if ($status_job_profile->status == '3') { ?>
+            <?php if ($status_job_profile->status == '3' || $status_job_profile->status == '0' || $status_job_profile->status == '1') { ?>
                 <button class="btn btn-success btn-sm float-end" style="cursor:default;">Sent to PUK Tertinggi</button>
             <?php } else { ?>
                 <form id="form_delegate_individu">

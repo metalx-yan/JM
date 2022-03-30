@@ -187,12 +187,10 @@ class Job_m_c extends CI_Controller {
         $username = $_SESSION['username'];
         $modal = $this->input->post('modal');
         $position_id = $this->input->post('position');
-        // var_dump($position_id);die;
         $id = $this->input->post('id');
         
         $query_search_delegate = "SELECT * from status_job_profile a inner join db_jrms.tb_user b on a.delegate_to = b.user_name inner join db_jrms.branch c on b.branch = c.id_branch";
         $query_delegate = $this->db_jobmanagement->query($query_search_delegate)->row();
-        // var_dump($query_delegate);die;
         $data['id_job'] = $this->training_parameter->join_2_distinct(
             $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
             ,$field_id,$position_id,'list_jobs.id,job.id_job,job.job_title,posisi.position_name'
@@ -218,6 +216,10 @@ class Job_m_c extends CI_Controller {
         
         $data['position_id'] = $position_id;
         $data['delegate'] = $this->db_jobmanagement->query($query)->result_array();
+
+        $query_is_access = "SELECT user_name FROM db_jrms.jrms_user_access where jabatan in ('100', '101')";
+        $data['is_admin'] = $this->db->query($query_is_access)->result_array();
+
         $data['query_delegate'] = $query_delegate;
         $html_modal = $this->load->view('Modal/Modal_delegate',$data,TRUE);
         echo $html_modal;
@@ -306,7 +308,8 @@ class Job_m_c extends CI_Controller {
         $kode_job_function = 'Y';
         $field_job_function = 'flagactive';
         
-        $data['cek_send_admin'] = $this->training_parameter->where_double('status_job_profile','job_list_id','delegate_to',$position_id,NULL)->num_rows();
+        $data['cek_send_admin'] = $this->training_parameter->where($position_id,'status_job_profile','job_list_id')->num_rows();
+        // $data['cek_']
 
         $data['id_job'] = $this->training_parameter->join_2_distinct(
             $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
@@ -447,8 +450,13 @@ class Job_m_c extends CI_Controller {
         $data['job_position'] = $this->db_jobmanagement->query($query_job)->row();
         $data['id_job'] = $this->db_jobmanagement->query($query_get)->row();
         $data['people'] = $this->db_jobmanagement->query($query_name)->result_array();
-        $data['user_onjob'] = $this->training_parameter->gets('mapping_job')->result_array();
+        $data['user_onjob'] = $this->training_parameter->gets('mapping_job', 'user_name')->result_array();
+        $arrs = [];
+        foreach ($data['user_onjob'] as $val) {
+            $arrs[] = $val['user_name'];
+        }
 
+        $data['user_act'] = $arrs;
         $html_modal = $this->load->view('Modal/Modal_mapping',$data,TRUE);
         echo $html_modal;
     }
