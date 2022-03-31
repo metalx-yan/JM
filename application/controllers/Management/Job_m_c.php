@@ -96,6 +96,57 @@ class Job_m_c extends CI_Controller {
         echo $this->M_Datatables->get_tables_query_job($query,$search,$where,$isWhere);
     }
 
+    public function get_live(){
+        $query = "SELECT distinct a.id,a.position_id, b.position_name,c.id_job,c.job_title, f.status status_awal, g.status status_akhir from list_jobs a
+        join posisi b
+        on a.position_id = b.position_id
+        join job c
+        on a.job_name = c.id_job
+        join organization d
+        on d.orgid = b.org_id
+        join direktorat e
+        on d.direktorat = e.id_dir
+        left join status_job f
+        on a.id = f.job_list_id 
+        left join status_job_profile g
+        on a.id = g.job_list_id";
+        foreach($_POST as $key => $val){
+            $data[$key] = $val;
+        }
+        $params = '';
+
+        if (isset($data['status']) == true) {
+            if ($data['status'] == '0') {
+                $params = ([]);
+                $isWhere = 'a.verify_validasi IS NULL and (g.status != 1 or g.status IS NULL)';
+
+            } else {
+                $params = (['g.status' => $data['status']]);
+                $isWhere = 'a.verify_validasi IS NULL';
+
+            }
+        } else if(isset($data['status']) == false){
+            if(isset($data['direktorat']) == true && isset($data['organisasi']) != true && isset($data['posisi']) != true){
+                $params = (['e.id_dir' => $data['direktorat']]);
+            } else if(isset($data['direktorat']) == true && isset($data['organisasi']) == true && isset($data['posisi']) != true) {
+                $params = (['e.id_dir' => $data['direktorat'], 'd.orgid' => $data['organisasi']]);
+            } else if(isset($data['direktorat']) == true && isset($data['organisasi']) == true && isset($data['posisi']) == true){
+                $params = (['e.id_dir' => $data['direktorat'], 'd.orgid' => $data['organisasi'], 'b.position_id' => $data['posisi']]);
+            }
+            $isWhere = 'a.verify_validasi IS NULL';
+
+        }
+        $search = array('a.position_id','b.position_name','c.job_title');
+        
+        $where = $params;
+        $isWhere = $isWhere;
+        // jika memakai IS NULL pada where sql
+        // $isWhere = 'artikel.deleted_at IS NULL';
+      
+        header('Content-Type: application/json');
+        echo $this->M_Datatables->get_tables_query_job($query,$search,$where,$isWhere);
+    }
+
     public function get_sec()
     {
         $username = $_SESSION['username'];

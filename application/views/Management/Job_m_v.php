@@ -167,8 +167,19 @@
                               </div>
                             </div>
 
-                              <button type="button" data="search" onclick="subsearch(this)" class="btn btn-warning float-end">Search</button>
-                              <br>
+                            <div class="mb-3 row">
+                              <label class="col-sm-5 col-form-label">Status</label>
+                              <div class="col-sm-7 form-group">
+                              <select onchange="check_v(this)" name="status" id="input-status" class="form-select form-select-sm status" aria-label=".form-select-sm example">
+                                <option value="" selected></option>
+                                <option value="1">Sudah Selesai</option>
+                                <option value="0">Dalam Proses</option>
+                              </select>
+                              <span id="error"></span>
+                              </div>
+                            </div>
+
+                              <!-- <button type="button" data="search" onclick="subsearch(this)" class="btn btn-warning float-end">Search</button> -->
                       </div>
                       </form>
                   </div>
@@ -178,7 +189,7 @@
                       List Job
                     </div>
                     <div class="card-body">
-                      <table id="manage_menu_sec" class="table table-bordered table-striped text-center align-middle" width="100%">
+                      <table id="manage_menu_third" class="table table-bordered table-striped text-center align-middle" width="100%">
                         <thead>
                             <tr class="text-center">
                                 <th>No</th>
@@ -666,8 +677,9 @@ $(document).ready(function() {
         var value = $(this).val();
         var val = {};
         val.direktorat = value;
+        autosearch(val);
         $.post('<?php echo base_url()?>Management/Job_m_c/change_direktorat',val,function(data){ 
-        console.log(data);
+        // console.log(data);
             $('.organisasi').html(data);
         });
     });
@@ -675,13 +687,129 @@ $(document).ready(function() {
     $('#input-organisasi').change(function(){ 
         // alert('tes');
         var value = $(this).val();
+        var value_dir = $('#input-direktorat').val();
         var val = {};
         val.organisasi = value;
+        val.direktorat = value_dir;
+
         $.post('<?php echo base_url()?>Management/Job_m_c/change_organisasi',val,function(data){ 
-        console.log(data);
+        // console.log(data);
             $('.posisi').html(data);
         });
     });
+
+    $('#input-posisi').change(function(){ 
+        // alert('tes');
+        var value = $(this).val();
+        var value_dir = $('#input-direktorat').val();
+        var value_org = $('#input-organisasi').val();
+        var val = {};
+        val.direktorat = value_dir;
+        val.organisasi = value_org;
+        val.posisi = value;
+
+        autosearch(val);
+       
+    });
+
+    $('#input-status').change(function(){ 
+        // alert('tes');
+        var value = $(this).val();
+        var value_dir = $('#input-direktorat').val();
+        var value_org = $('#input-organisasi').val();
+        var value_status =  $('#input-status').val();
+        var value_posisi =  $('#input-posisi').val();
+        var val = {};
+        val.direktorat = value_dir;
+        val.organisasi = value_org;
+        val.status = value_status;
+        val.posisi = value_posisi;
+
+        autosearch(val);
+       
+    });
+
+    function autosearch(value) 
+    {
+        var vals = {};
+        var value_status =  $('#input-status').val();
+        val.direktorat = value.direktorat;
+        val.organisasi = value.organisasi;
+        val.posisi = value.posisi;
+        val.status = value.status;
+        console.log(val)
+        search_option(val)
+    }
+
+    function search_option(form){
+        var datatable = $('#manage_menu_third').DataTable({
+        "destroy": true,
+        "processing": false,
+        "responsive": true,
+        "serverSide": true,
+        "ordering": true, // Set true agar bisa di sorting
+        "ajax": {
+            "url": "<?= base_url('Management/Job_m_c/get_live/'); ?>", // URL file untuk proses select datanya
+            "type": "POST",
+            "data": form,
+            beforeSend: function() {
+                $("#loader").show();
+            },
+            complete: function() {
+                $("#loader").hide();
+            },
+        },
+        "deferRender": true,
+        "aLengthMenu": [
+            [5, 10, 50],
+            [5, 10, 50]
+        ], // Combobox Limit
+            "columns": [
+                {
+                    "data": 'id',
+                    "sortable": false, // !!! id_sort
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
+                {
+                    "data": "position_id"
+                },
+                {
+                    "data": "position_name"
+                },
+                {
+                    "data": "job_title"
+                },
+                {
+                    data: null,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        if (data.status_awal == data.status_akhir) {
+                            success = '<i class="bi bi-check2-circle" style="color:green;"></i>'
+                        } else {
+                            success = '<i class="bi bi-arrow-clockwise"></i>'
+                        }
+                        return success 
+                    },
+
+                },
+                {
+                    data: null,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        if (data.status_awal == data.status_akhir) {
+                            success = 'Sudah Selesai'
+                        } else {
+                            success = 'Dalam Proses'
+                        }
+                        return success 
+                    },
+
+                }
+            ],
+    });
+    }
 
 });
 
