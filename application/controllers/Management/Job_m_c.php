@@ -121,8 +121,19 @@ class Job_m_c extends CI_Controller {
                 $isWhere = 'a.verify_validasi IS NULL and (g.status != 1 or g.status IS NULL)';
 
             } else {
-                $params = (['g.status' => $data['status']]);
-                $isWhere = 'a.verify_validasi IS NULL';
+                if (isset($data['status']) == true && (isset($data['direktorat']) != true && isset($data['organisasi']) != true && isset($data['posisi']) != true )) {
+                    $params = (['g.status' => $data['status']]);
+                    $isWhere = 'a.verify_validasi IS NULL';
+                } else if((isset($data['direktorat']) == true && isset($data['status']) == true) && (isset($data['organisasi']) != true && isset($data['posisi']) != true) ){
+                    $params = (['e.id_dir' => $data['direktorat'],'g.status' => $data['status']]);
+                    $isWhere = 'a.verify_validasi IS NULL';
+                } else if((isset($data['direktorat']) == true && isset($data['organisasi']) == true && isset($data['status']) == true) && isset($data['posisi']) != true ) {
+                    $params = (['e.id_dir' => $data['direktorat'], 'd.orgid' => $data['organisasi'],'g.status' => $data['status']]);
+                    $isWhere = 'a.verify_validasi IS NULL';
+                } else if(isset($data['direktorat']) == true && isset($data['organisasi']) == true && isset($data['posisi']) == true && isset($data['status']) == true){
+                    $params = (['e.id_dir' => $data['direktorat'], 'd.orgid' => $data['organisasi'], 'b.position_id' => $data['posisi'],'g.status' => $data['status']]);
+                    $isWhere = 'a.verify_validasi IS NULL';
+                }
 
             }
         } else if(isset($data['status']) == false){
@@ -136,6 +147,7 @@ class Job_m_c extends CI_Controller {
             $isWhere = 'a.verify_validasi IS NULL';
 
         }
+        // var_dump($isWhere);die;
         $search = array('a.position_id','b.position_name','c.job_title');
         
         $where = $params;

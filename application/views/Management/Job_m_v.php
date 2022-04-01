@@ -675,8 +675,11 @@ $(document).ready(function() {
     $('#input-direktorat').change(function(){ 
         // alert('tes');
         var value = $(this).val();
+        var value_status =  $('#input-status').val() == '' ? undefined : $('#input-status').val();
+
         var val = {};
         val.direktorat = value;
+        val.status = value_status;
         autosearch(val);
         $.post('<?php echo base_url()?>Management/Job_m_c/change_direktorat',val,function(data){ 
         // console.log(data);
@@ -687,11 +690,11 @@ $(document).ready(function() {
     $('#input-organisasi').change(function(){ 
         // alert('tes');
         var value = $(this).val();
-        var value_dir = $('#input-direktorat').val();
+        var value_dir = $('#input-direktorat').val() == '' ? undefined : $('#input-direktorat').val();
         var val = {};
         val.organisasi = value;
         val.direktorat = value_dir;
-
+        autosearch(val);
         $.post('<?php echo base_url()?>Management/Job_m_c/change_organisasi',val,function(data){ 
         // console.log(data);
             $('.posisi').html(data);
@@ -701,12 +704,15 @@ $(document).ready(function() {
     $('#input-posisi').change(function(){ 
         // alert('tes');
         var value = $(this).val();
-        var value_dir = $('#input-direktorat').val();
-        var value_org = $('#input-organisasi').val();
+        var value_dir = $('#input-direktorat').val() == '' ? undefined : $('#input-direktorat').val();
+        var value_org = $('#input-organisasi').val() == '' ? undefined : $('#input-organisasi').val();
+        var value_status =  $('#input-status').val()  == '' ? undefined : $('#input-status').val();
         var val = {};
         val.direktorat = value_dir;
         val.organisasi = value_org;
         val.posisi = value;
+        val.status = value_status;
+
 
         autosearch(val);
        
@@ -715,10 +721,10 @@ $(document).ready(function() {
     $('#input-status').change(function(){ 
         // alert('tes');
         var value = $(this).val();
-        var value_dir = $('#input-direktorat').val();
-        var value_org = $('#input-organisasi').val();
-        var value_status =  $('#input-status').val();
-        var value_posisi =  $('#input-posisi').val();
+        var value_dir = $('#input-direktorat').val() == '' ? undefined : $('#input-direktorat').val();
+        var value_org = $('#input-organisasi').val() == '' ? undefined : $('#input-organisasi').val();
+        var value_status =  $('#input-status').val()  == '' ? undefined : $('#input-status').val();
+        var value_posisi =  $('#input-posisi').val() == '' ? undefined : $('#input-posisi').val();
         var val = {};
         val.direktorat = value_dir;
         val.organisasi = value_org;
@@ -732,7 +738,7 @@ $(document).ready(function() {
     function autosearch(value) 
     {
         var vals = {};
-        var value_status =  $('#input-status').val();
+        var value_status =  $('#input-status').val()  == '' ? undefined : $('#input-status').val();
         val.direktorat = value.direktorat;
         val.organisasi = value.organisasi;
         val.posisi = value.posisi;
