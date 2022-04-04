@@ -49,39 +49,44 @@ class Employee_c extends CI_Controller {
 
     public function get(){
         $query = "SELECT DISTINCT
-        v.user_name,
-        v.nama,
-        v.job_title,
-        v.singkatan,
-        b.position_name,
-        b.id_job, 
+        q.user_name,
+        q.nama,
         CASE
-            WHEN v.status = 1 THEN 'Read'
-            ELSE 'Belum Read'
-            END status_job
-    FROM ( select distinct a.user_name,
-        a.nama,
-        a.job_title,
-        c.singkatan,
-        h.STATUS from
-        db_jrms.tb_user a
-        INNER JOIN db_jrms.branch c ON a.branch = c.id_branch
-        LEFT JOIN db_jrms.status_job h ON a.user_name = h.nip where a.STATUS = 1 ) v
-        LEFT JOIN (
-    SELECT DISTINCT
-        x.id_job,
-        x.job_title,
-        y.position_id,
-        y.position_name,
-        y.org_id,
-        z.direktorat 
-    FROM
-        job x
-        INNER JOIN posisi y ON x.id_job = y.job_id
-        INNER JOIN organization z ON z.orgid = y.org_id 
-    GROUP BY
-        y.org_id 
-        ) b ON v.job_title = b.job_title";
+            
+            WHEN q.STATUS = 1 THEN
+            'Dibaca' ELSE 'Belum Dibaca' 
+            END status_job,
+            q.singkatan,
+            p.position_name 
+        FROM
+            (
+        SELECT
+            a.user_name,
+            a.nama,
+            b.STATUS,
+            c.position_id,
+            g.singkatan,
+            c.job_name 
+        FROM
+            db_jrms.tb_user a
+            LEFT JOIN mapping_job b ON a.user_name = b.user_name
+            LEFT JOIN list_jobs c ON b.job_list_id = c.id
+            INNER JOIN db_jrms.branch g ON a.branch = g.id_branch 
+        WHERE
+            a.STATUS = 1 
+            ) q
+            LEFT JOIN (
+        SELECT DISTINCT
+            x.position_id,
+            x.position_name,
+            z.direktorat,
+            x.org_id 
+        FROM
+        posisi x
+        INNER JOIN job k ON x.job_id = k.id_job
+        INNER JOIN organization z ON z.orgid = x.org_id 
+        ) p ON q.position_id = p.position_id
+        LEFT JOIN ( SELECT DISTINCT k.id_job, k.job_title FROM posisi x INNER JOIN job k ON x.job_id = k.id_job ) w ON q.job_name = w.id_job";
 
         foreach($_POST as $key => $val){
             $data[$key] = $val;
@@ -89,15 +94,15 @@ class Employee_c extends CI_Controller {
         
         $params = '';
         if( $data['direktorat'] && $data['organisasi']  && $data['posisi']){
-            $params = (['b.direktorat' => $data['direktorat'], 'b.org_id' => $data['organisasi'], 'b.position_id' => $data['posisi']]);
+            $params = (['p.direktorat' => $data['direktorat'], 'p.org_id' => $data['organisasi'], 'p.position_id' => $data['posisi']]);
         } else if($data['direktorat'] && $data['organisasi']) {
-            $params = (['b.direktorat' => $data['direktorat'], 'b.org_id' => $data['organisasi']]);
+            $params = (['p.direktorat' => $data['direktorat'], 'p.org_id' => $data['organisasi']]);
         } else if($data['direktorat']){
-            $params = (['b.direktorat' => $data['direktorat']]);
+            $params = (['p.direktorat' => $data['direktorat']]);
         } else{
             $params = null;
         }
-        $search = array('v.user_name', 'v.nama','v.singkatan','v.job_title', 'b.position_name');
+        $search = array('q.user_name', 'q.nama','q.singkatan' , 'p.position_name');
 
         $where = $params;
         // $where  = array('nama_kategori' => 'Tutorial');

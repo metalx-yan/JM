@@ -251,8 +251,9 @@ class Job_m_c extends CI_Controller {
         $modal = $this->input->post('modal');
         $position_id = $this->input->post('position');
         $id = $this->input->post('id');
-        
-        $query_search_delegate = "SELECT * from status_job_profile a inner join db_jrms.tb_user b on a.delegate_to = b.user_name inner join db_jrms.branch c on b.branch = c.id_branch";
+        // var_dump($position_id);die;
+        $query_search_delegate = "SELECT * from status_job_profile a inner join db_jrms.tb_user b on a.delegate_to = b.user_name inner join db_jrms.branch c on b.branch = c.id_branch where a.job_list_id = $position_id";
+    
         $query_delegate = $this->db_jobmanagement->query($query_search_delegate)->row();
         $data['id_job'] = $this->training_parameter->join_2_distinct(
             $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
@@ -281,9 +282,17 @@ class Job_m_c extends CI_Controller {
         $data['delegate'] = $this->db_jobmanagement->query($query)->result_array();
 
         $query_is_access = "SELECT user_name FROM db_jrms.jrms_user_access where jabatan in ('100', '101')";
-        $data['is_admin'] = $this->db->query($query_is_access)->result_array();
+        $is_admin = $this->db->query($query_is_access)->result_array();
 
+        $data_admin = [];
+
+        foreach ($is_admin as $data_adm){
+            $data_admin[] = $data_adm['user_name'];
+        }
+
+        $data['is_admin'] = $data_admin;
         $data['query_delegate'] = $query_delegate;
+        // var_dump($data['query_delegate']);die;
         $html_modal = $this->load->view('Modal/Modal_delegate',$data,TRUE);
         echo $html_modal;
     }
@@ -458,11 +467,19 @@ class Job_m_c extends CI_Controller {
             $data[$key] = $val;
         }
         // var_dump($data);die;
-        $this->now;
-        $now = date('Y-m-d H:i:s');
-        $map = explode('-',$data['mapping']);
-        $array = ['user_name' => $map[1], 'job_list_id' => $data['job'], 'mapping_by' => $data['mapping_to'], 'created_at' => $now];
-        $save = $this->training_parameter->save($array,'mapping_job');
+        $check = $this->training_parameter->where($data['job'],'mapping_job','job_list_id')->num_rows();
+        if ($check > 0) {
+            $map = explode('-',$data['mapping']);
+            $data_update = ['user_name' => $map[1]]; 
+            $save = $this->training_parameter->update($data['job'],$data_update,'mapping_job','job_list_id');
+        } else {
+            $this->now;
+            $now = date('Y-m-d H:i:s');
+            $map = explode('-',$data['mapping']);
+            $array = ['user_name' => $map[1], 'job_list_id' => $data['job'], 'mapping_by' => $data['mapping_to'], 'created_at' => $now];
+            $save = $this->training_parameter->save($array,'mapping_job');
+        }
+        
           
         if ($save == true) {
             $msg = 'Berhasil di Simpan';
@@ -520,6 +537,17 @@ class Job_m_c extends CI_Controller {
         }
 
         $data['user_act'] = $arrs;
+
+        $query_is_access = "SELECT user_name FROM db_jrms.jrms_user_access where jabatan in ('100', '101')";
+        $is_admin = $this->db->query($query_is_access)->result_array();
+
+        $data_admin = [];
+
+        foreach ($is_admin as $data_adm){
+            $data_admin[] = $data_adm['user_name'];
+        }
+
+        $data['is_admin'] = $data_admin;
         $html_modal = $this->load->view('Modal/Modal_mapping',$data,TRUE);
         echo $html_modal;
     }

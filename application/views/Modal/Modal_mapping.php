@@ -38,11 +38,12 @@
                             <select onchange="check_v(this)" name="mapping" id="input-mapping" class="form-select form-select-sm" aria-label=".form-select-sm example" <?php echo (($id == 'modal_delete') ? 'disabled' : '') ?> required>
                                     <option value="<?= (($id_job) ? $id_job->user_name : '') ?>" selected><?php echo (($id_job) ? $id_job->singkatan . ' - ' . strtoupper($id_job->nama) . ' - ' . $id_job->job_title  : '') ?></option>
                                 <?php foreach ($people as $name) : ?>
-                                    <?php if (in_array($name['user_name'],$user_act)) { ?>
-                                        <option value="" disabled style="background-color:#c7c5c5; "><?=  strtoupper($name['nama']) ?></option>
-                                   <?php } else {?> 
-                                        <option value="<?= $name['nama'] .'-'.$name['user_name'] ?>"><?=  strtoupper($name['nama']) ?></option>
-                                   <?php } ?> 
+                                   
+                                            <?php if (in_array($name['user_name'],$user_act)) { ?>
+                                                <option value="" disabled style="background-color:#c7c5c5; "><?=  strtoupper($name['nama']) ?></option>
+                                           <?php } else {?> 
+                                                <option value="<?= $name['nama'] .'-'.$name['user_name'] ?>"><?=  strtoupper($name['nama']) ?></option>
+                                           <?php } ?> 
                                 <?php endforeach; ?>
                             </select>
                         <span id="error"></span>

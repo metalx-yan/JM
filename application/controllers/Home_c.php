@@ -59,9 +59,11 @@ class Home_c extends CI_Controller
     {
         $jabatan = $_SESSION['jabatan'];
         if ($jabatan == '100') {
+            $username = $_SESSION['username'];
+
             # code...
             // , CASE WHEN b.status = 0 THEN 'Belum Ada' WHEN b.status = 1 THEN 'Admin' END status_job 
-            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan,b.status, z.status status_akhir, $jabatan as role
+            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan,b.status, z.status status_akhir, $jabatan as role,null mapping_by,null nip,null status_del_read
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -75,7 +77,48 @@ class Home_c extends CI_Controller
             on a.id = b.job_list_id
             left join status_job_profile z
             on a.id = z.job_list_id
-            where a.id = b.job_list_id and e.jabatan != '100' and d.status ='1'";
+            where a.id = b.job_list_id and e.jabatan != '100' and d.status ='1'
+            union
+            SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan , k.status status_individu, null,null,u.mapping_by, u.user_name nip,'read' status_del_read
+            from list_jobs a
+            inner join posisi c
+            on a.position_id = c.position_id
+            inner join job g
+            on a.job_name = g.id_job
+            inner join db_jrms.tb_user d
+            on a.user_name = d.user_name
+            inner join db_jrms.jrms_user_access e
+            on a.user_name = e.user_name						
+            left join (select x.id,z.nama,x.status,x.job_list_id,z.status status_aktif from status_job x
+            join db_jrms.tb_user z
+            on x.approved_by = z.user_name)  b
+            on a.id = b.job_list_id
+            left join status_job_profile k
+            on a.id = k.job_list_id
+            left join mapping_job u
+            on a.id = u.job_list_id
+            where b.status_aktif = 1 and u.user_name = '$username' 
+            union
+            SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan , k.status status_individu, null,null,u.mapping_by, u.user_name nip,'delegate' status_del_read
+            from list_jobs a
+            inner join posisi c
+            on a.position_id = c.position_id
+            inner join job g
+            on a.job_name = g.id_job
+            inner join db_jrms.tb_user d
+            on a.user_name = d.user_name
+            inner join db_jrms.jrms_user_access e
+            on a.user_name = e.user_name						
+            left join (select x.id,z.nama,x.status,x.job_list_id,z.status status_aktif from status_job x
+            join db_jrms.tb_user z
+            on x.approved_by = z.user_name)  b
+            on a.id = b.job_list_id
+            left join status_job_profile k
+            on a.id = k.job_list_id
+            left join mapping_job u
+            on a.id = u.job_list_id
+            where b.status_aktif = 1 and  k.delegate_to = '$username'
+            ";
 
             $data = $this->db_jobmanagement->query($query)->result_array();
             $counts  = $this->db_jobmanagement->query($query)->num_rows();
@@ -132,7 +175,7 @@ class Home_c extends CI_Controller
         } else {
             $username = $_SESSION['username'];
             
-            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama , k.status status_individu, u.mapping_by, u.user_name nip
+            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama , k.status status_individu, u.mapping_by, u.user_name nip,'read' status_del_read
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -150,7 +193,27 @@ class Home_c extends CI_Controller
             on a.id = k.job_list_id
             left join mapping_job u
             on a.id = u.job_list_id
-            where b.status_aktif = 1 and k.delegate_to = '$username' or  u.user_name = '$username'";
+            where b.status_aktif = 1 and u.user_name = '$username' 
+            union
+            SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama , k.status status_individu, u.mapping_by, u.user_name nip,'delegate' status_del_read
+            from list_jobs a
+            inner join posisi c
+            on a.position_id = c.position_id
+            inner join job g
+            on a.job_name = g.id_job
+            inner join db_jrms.tb_user d
+            on a.user_name = d.user_name
+            inner join db_jrms.jrms_user_access e
+            on a.user_name = e.user_name						
+            left join (select x.id,z.nama,x.status,x.job_list_id,z.status status_aktif from status_job x
+            join db_jrms.tb_user z
+            on x.approved_by = z.user_name)  b
+            on a.id = b.job_list_id
+            left join status_job_profile k
+            on a.id = k.job_list_id
+            left join mapping_job u
+            on a.id = u.job_list_id
+            where b.status_aktif = 1 and  k.delegate_to = '$username'";
 
             $data = $this->db_jobmanagement->query($query)->result_array();
             $counts  = $this->db_jobmanagement->query($query)->num_rows();

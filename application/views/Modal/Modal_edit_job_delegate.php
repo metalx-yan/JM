@@ -56,9 +56,12 @@
                                             
                                             <?php  }?>
                                         <?php  }?>
+                            <?php  } else if ($status_job_profile->status == '1') {?>
+                                <button type="button" style="cursor: default;" class="btn btn-success btn-sm float-end">Approved to Admin</button>
+
                             <?php  } else {?>
                             
-                            <?php if ($status_job_profile->status != null && $status_job_profile == null ? : $status_job_profile->status != '3') {
+                            <?php if ($status_job_profile->status != null && $status_job_profile == null ? : ($status_job_profile->status != NULL && $status_job_profile->status == '0')) {
                                 ?>
                                         <button type="button" style="cursor: default;" class="btn btn-success btn-sm float-end">Sent to Admin</button>
                                     <?php } else { ?>
