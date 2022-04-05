@@ -209,6 +209,74 @@ class Job_m_c extends CI_Controller {
         echo json_encode($callback); // Convert array $callback ke json
     }
 
+    function print()
+    {
+        
+        $id_jobs = $this->input->get('string');
+        $id_job = str_replace(' _', '', base64_decode($id_jobs)); 
+        // var_dump($id_job);die;
+        $table = 'job';
+        $table_posisi = 'posisi';
+        $table_tugas_tanggung_jawab = 'tugas_tanggung_jawab';
+        $table_kewenangan = 'kewenangan';
+        $table_kompetensi = 'kompetensi';
+        $table_listjob = 'list_jobs';
+        $on1 = 'job_name';
+        $on2 = 'id_job';
+        $field_id = 'list_jobs.id';
+        $on3 = 'position_id';
+        
+        $data['data_job'] = $this->training_parameter->join_2_distinct(
+            $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
+            ,$field_id,$id_job,'list_jobs.id,job.id_job,job.job_title,posisi.position_name'
+        )->row();
+
+        $data['tanggung_jawab'] = $this->training_parameter->join($id_job,$table_listjob,'id',$table_tugas_tanggung_jawab,'job_list_id','id','tugas_tanggung_jawab.description')->result_array();
+
+        $data['kewenangan'] = $this->training_parameter->join($id_job,$table_listjob,'id',$table_kewenangan,'job_list_id','id','kewenangan.kewenangan')->result_array();
+
+        $data['kompetensi'] = $this->training_parameter->join($id_job,$table_listjob,'id',$table_kompetensi,'job_list_id','id','kompetensi.kompetensi')->result_array();
+
+        $query_pengalaman_kerja = "SELECT
+        kualifikasi.id, z.description   
+        FROM
+            numbers INNER JOIN kualifikasi
+            ON CHAR_LENGTH(kualifikasi.work_experience)
+            -CHAR_LENGTH(REPLACE(kualifikasi.work_experience, '-', ''))>=numbers.n-1
+            join work_experience z
+            on SUBSTRING_INDEX(SUBSTRING_INDEX(kualifikasi.work_experience, '-', numbers.n), '-', -1) = z.id
+        where kualifikasi.job_list_id = '$id_job'
+        group by z.id
+        ORDER BY
+            id, n";
+
+        $query = "SELECT distinct a.id id_list_job,c.id_job,c.job_title,b.position_name, d.Discipline_Description,
+        e.job_family,f.job_sub_family,g.job_function,h.job_sub_function
+        from list_jobs a
+        join posisi b
+        on a.position_id = b.position_id
+        join job c
+        on a.job_name = c.id_job
+        join job_discipline d
+        on a.job_discipline = concat(d.Discipline_Code, '-' , d.Discipline_Description)
+        join job_family e
+        on a.job_family = e.id_job_family
+        join job_sub_family f
+        on a.job_sub_family = f.id
+        join job_function g
+        on a.job_function = g.id_job_function
+        join job_sub_function h
+        on a.job_sub_function = h.id
+        where a.id = '$id_job'";
+        $data['data_profile'] = $this->db_jobmanagement->query($query)->row();
+        $data['pengalaman_kerja'] = $this->db_jobmanagement->query($query_pengalaman_kerja)->result_array();
+            // var_dump($data['pengalaman_kerja']);die;
+        $mpdf = new \Mpdf\Mpdf();
+        $html = $this->load->view('Pdf',$data,true);
+        $mpdf->writeHtml($html);
+        return $mpdf->Output();    
+    }
+
     function send_admin(){
         foreach($_POST as $key => $val){
             $data[$key] = $val;

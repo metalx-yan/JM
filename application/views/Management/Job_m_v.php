@@ -214,7 +214,6 @@
     <div class="modal_send_admin"></div>
     <div class="modal_delegate"></div>
     <div class="modal_mapping"></div>
-
 </section>
 
 <script>
@@ -347,7 +346,8 @@ function search(form) {
                     render: function(data, type, row, meta) {
                         adds = '<button class="btn btn-primary m-3" value="'+data.id+'" onclick="view_modal()">View</button>'
                         views = '<button id="btn-edits" value="'+data.id+'" class="btn btn-warning m-3" onclick="edit_modal()">Edit</button>'
-                        return adds + views 
+                        print = '<button id="btn-prints" value="'+data.id+'" class="btn btn-secondary m-3" onclick="print_data()">Print</button>'
+                        return adds + views + print
                     },
 
                 }
@@ -452,6 +452,25 @@ function mapping_modal() {
         }
     });
 };
+
+function print_data(){
+    data = event.target.value
+    console.log(data);
+    var val = {};
+    val.job_list_id = data
+    $.ajax({
+        url: '<?= base_url('Management/Job_m_c/print/') ?>',
+        type: "GET",
+        data: val,
+        success: function(res) {
+            enc = btoa(val.job_list_id+ ' _')
+            window.open('<?php echo base_url() ?>Management/Job_m_c/print/?string='+ enc);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('gagal');
+        }
+    });
+}
 
 function send(form){
     Swal.fire({

@@ -177,9 +177,13 @@
                         views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="review_modal()">View</button>'
                         return views 
                     //   } else if (data.role != '101' && data.role != '100'  && data.role != '102' && data.mapping_by != null) {
-                      } else if (data.status_del_read == 'read') {
+                      } else if (data.status_del_read == 'read' && data.status_read == '1') {
                         views = '<button id="btn-reads" value="'+data.id+'" class="btn btn-warning m-3" onclick="read_modal()">Read</button>'
-                        return views 
+                        print = '<button id="btn-reads" value="'+data.id+'" class="btn btn-secondary m-3" onclick="print_data()">Print</button>'
+                        return views + print
+                      } else if (data.status_del_read == 'read' && data.status_read != '1') {
+                        views = '<button id="btn-reads" value="'+data.id+'" class="btn btn-warning m-3" onclick="read_modal()">Read</button>'
+                        return views
                       } else if(data.status_del_read == 'delegate'){
                         views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="delegate_modal()">Edit</button>'
                         return views
@@ -407,6 +411,25 @@
             }
         });
     };
+
+    function print_data(){
+        data = event.target.value
+        console.log(data);
+        var val = {};
+        val.job_list_id = data
+        $.ajax({
+            url: '<?= base_url('/Home_c/print/') ?>',
+            type: "GET",
+            data: val,
+            success: function(res) {
+                enc = btoa(val.job_list_id+ ' _')
+                window.open('<?php echo base_url() ?>/Home_c/print/?string='+ enc);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert('gagal');
+            }
+        });
+    }
 
     function action_submit(data_) {
       action = $(data_).attr('data');
