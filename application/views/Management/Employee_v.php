@@ -143,7 +143,7 @@ function search(form) {
                 data: null,
                 "sortable": false,
                 render: function(data, type, row, meta) {
-                    adds = '<a href="" onclick="view_modal(this)" style="color:black;" data="'+data.id_job+'">'+data.position_name+'</a>'
+                    adds = '<a href="" onclick="view_modal(this)" style="color:black;" data="'+data.id_job+'">'+data.job_title+'</a>'
                     return adds
                 },
 

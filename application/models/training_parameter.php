@@ -63,6 +63,10 @@ class training_parameter extends CI_Model {
         return $this->db_jobmanagement->get_where($table,[$field=>$kode]);
     }
 
+    function where_user_access($kode,$table,$field){
+        return $this->db->get_where($table,[$field=>$kode]);
+    }
+
     function where_null($table,$field,$select){
         $this->db_jobmanagement->select("$select");
         $this->db_jobmanagement->where("$field IS NULL");
@@ -159,6 +163,11 @@ class training_parameter extends CI_Model {
         return $this->db_jobmanagement->update($table,$data);
     }
 
+    function update_user_access($kode_key,$data,$table,$field){
+        $this->db->where($field,$kode_key);
+        return $this->db->update($table,$data);
+    }
+
     function update_data($kode_key,$data,$table,$field,$data2,$field2,$field3)
     {
         $this->db_jobmanagement->set($field3, $data);
@@ -202,6 +211,10 @@ class training_parameter extends CI_Model {
 
     function gets($table, $select){
         return $this->db_jobmanagement->distinct()->select("$select")->get($table);
+    }
+
+    function gets_user_access($table, $select){
+        return $this->db->distinct()->select("$select")->order_by('nama')->get($table);
     }
 
     function get_select_max($table,$select){

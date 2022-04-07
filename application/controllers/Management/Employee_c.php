@@ -57,7 +57,7 @@ class Employee_c extends CI_Controller {
             'Dibaca' ELSE 'Belum Dibaca' 
             END status_job,
             q.singkatan,
-            p.position_name 
+            p.position_name,w.job_title,w.id_job
         FROM
             (
         SELECT
