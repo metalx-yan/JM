@@ -53,6 +53,7 @@
             </thead>
           </table>
           <?php } else if ($_SESSION['jabatan'] == '101') {?>
+            <p><span class="badge rounded-pill " style="background-color: rgb(92 88 183);">&nbsp;</span> <b style="font-size: 14px;">Sent Srom Delegate</b></p> 
             <p><span class="badge rounded-pill " style="background-color: rgb(88 183 165);">&nbsp;</span> <b style="font-size: 14px;">Waiting Send Job Profile</b></p> 
             <p><span class="badge rounded-pill " style="background-color: #cad92e;">&nbsp;</span> <b style="font-size: 14px;">Waiting Approve Job Profile</b></p> 
             <p><span class="badge rounded-pill " style="background-color: #3fd467;">&nbsp;</span> <b style="font-size: 14px;">Validation Approved</b></p>
@@ -117,7 +118,7 @@
               $(row).find('td:eq(0)').css('background-color', 'rgb(88 183 165)').css('color', 'white');
             }
             if(data.status == '1' && data.status_akhir == '3'){
-              $(row).find('td:eq(0)').css('background-color', 'rgb(88 183 165)').css('color', 'white');
+              $(row).find('td:eq(0)').css('background-color', 'rgb(92 88 183)').css('color', 'white');
             }
             if(data.status == '1' && data.status_akhir == 0){
               $(row).find('td:eq(0)').css('background-color', '#cad92e').css('color', 'white');
@@ -174,7 +175,11 @@
                           return views
                         // }
                       } else if (data.role == '101') {
-                        views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="review_modal()">View</button>'
+                        if (data.delegate_to != null) {
+                            views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="review_modal()">View</button>'
+                        } else {
+                            views = ''
+                        }
                         return views 
                     //   } else if (data.role != '101' && data.role != '100'  && data.role != '102' && data.mapping_by != null) {
                       } else if (data.status_del_read == 'read' && data.status_read == '1') {
@@ -185,7 +190,14 @@
                         views = '<button id="btn-reads" value="'+data.id+'" class="btn btn-warning m-3" onclick="read_modal()">Read</button>'
                         return views
                       } else if(data.status_del_read == 'delegate'){
-                        views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="delegate_modal()">Edit</button>'
+                          if (data.status == '3' && data.send_back == null) {
+                              views = '<button id="btn-views" value="'+data.id+'" class="btn btn-success m-3" onclick="delegate_modal()">Data Terkirim Ke PUK</button>'
+                            } else if(data.status == null && data.send_back != null) {
+                                views = '<button id="btn-views" value="'+data.id+'" class="btn btn-danger m-3" onclick="delegate_modal()">Data harus diperbaiki</button>'
+                            } else {
+                                views = '<button id="btn-views"  value="'+data.id+'" class="btn btn-warning m-3" onclick="delegate_modal()">Edit</button>'
+                            }
+
                         return views
                       }
                     },
@@ -433,12 +445,13 @@
 
     function action_submit(data_) {
       action = $(data_).attr('data');
+      action_send_back = $(data_).attr('data_delegate');
       $('#error').html(" ");
       form = $("#form_" + 'modal_view').serialize();
       $('#error').html(" ");
       formo = $("#form_" + action).serialize();
-      console.log(formo)
-      if (action == 'kualifikasi'  || action == 'tugas' || action == 'modal_send_admin' || action == 'tujuan' || action == 'kewenangan' || action == 'kompetensi' || action == 'kpi' || action == 'kualifikasi' || action == 'delegate_individu' || action == 'read') {
+      console.log(action_send_back)
+      if (action == 'kualifikasi'  || action == 'tugas' || action == 'modal_send_admin' || action == 'tujuan' || action == 'kewenangan' || action == 'kompetensi' || action == 'kpi' || action == 'kualifikasi' || action == 'delegate_individu' || action == 'read' || action == 'send_back') {
             $.ajax({
                 type: "POST",
                 url: "<?php echo site_url('Management/Job_m_c/validate_kual'); ?>",
@@ -448,7 +461,7 @@
                   console.log(form)
                     if (data.action == 'ok') {
                         if (action == 'modal_send_admin') {
-                            send(formo)
+                            send(action_send_back)
                         }  else if (action == 'kewenangan' || action == 'kompetensi' || action == 'kpi' || action == 'kualifikasi') {
                             save_multiple(formo);
                         } else if (action == 'tujuan') {
@@ -457,6 +470,8 @@
                             delegate_individu_to_admin(formo);
                         } else if (action == 'read') {
                             read_job(formo);
+                        } else if(action == 'send_back') {
+                            send_back(action_send_back);
                         } else {
                             save_multiple(formo);
                         }
@@ -650,6 +665,50 @@ function delegate_individu_to_admin(form) {
       })
   }
 
+  function send(form){
+      var data = {};
+      data.delegate = form
+      console.log(data)
+        Swal.fire({
+            title: 'Do you want to save the changes?',
+            showDenyButton: true,
+            confirmButtonText: 'Save',
+            denyButtonText: `Cancel`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '<?= base_url('/Home_c/send_admin/') ?>',
+                    type: "post",
+                    data: data,
+                    beforeSend: function() {
+                        $("#loader").show();
+                    },
+                    complete: function() {
+                        $("#loader").hide();
+                    },
+                    success: function(res) {
+                        if (res == 'Berhasil di Simpan') {
+                            $('#modal_send_admin').modal('hide');
+                            Swal.fire({
+                                title: 'Your has been saved.',
+                                icon: 'success',
+                            });
+
+                            setTimeout(function() {
+                                location.reload(true);
+                            }, 1000);
+                        } else {
+                            alert(res)
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert('gagal');
+                    }
+                });
+            }
+        })
+    }
+
   function save(form) {
       console.log(form);
       Swal.fire({
@@ -711,6 +770,56 @@ function delegate_individu_to_admin(form) {
                   url: '<?= base_url('/Home_c/read_save/') ?>',
                   type: "post",
                   data: form,
+                  beforeSend: function() {
+                      $("#loader").show();
+                  },
+                  complete: function() {
+                      $("#loader").hide();
+                  },
+                  success: function(res) {
+                      if (res == 'Berhasil di Simpan') {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: 'Your has been saved.',
+                              icon: 'success',
+                          });
+
+                          setTimeout(function() {
+                              location.reload(true);
+                          }, 1000);
+                      } else {
+                          $('#modal_edit').modal('hide');
+                          Swal.fire({
+                              title: res,
+                              icon: 'error',
+                          });
+
+                        
+                      }
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) {
+                      alert('gagal');
+                  }
+              });
+          }
+      })
+  }
+
+  function send_back(form) {
+      var data = {};
+      data.delegate = form
+      console.log(data);
+      Swal.fire({
+          title: 'Do you want to save the changes?',
+          showDenyButton: true,
+          confirmButtonText: 'Save',
+          denyButtonText: `Cancel`,
+      }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
+                  url: '<?= base_url('/Home_c/send_back_save/') ?>',
+                  type: "post",
+                  data: data,
                   beforeSend: function() {
                       $("#loader").show();
                   },

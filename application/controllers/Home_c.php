@@ -63,7 +63,7 @@ class Home_c extends CI_Controller
 
             # code...
             // , CASE WHEN b.status = 0 THEN 'Belum Ada' WHEN b.status = 1 THEN 'Admin' END status_job 
-            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan,b.status, z.status status_akhir, $jabatan as role,null mapping_by,null nip,null status_del_read,null status_read
+            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan,b.status, z.status status_akhir, $jabatan as role,null mapping_by,null nip,null status_del_read,null status_read,null send_back
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -79,7 +79,7 @@ class Home_c extends CI_Controller
             on a.id = z.job_list_id
             where a.id = b.job_list_id and e.jabatan != '100' and d.status ='1'
             union
-            SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan , k.status status_individu, null,null,u.mapping_by, u.user_name nip,'read' status_del_read, u.status status_read
+            SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan , k.status status_individu, null,null,u.mapping_by, u.user_name nip,'read' status_del_read, u.status status_read,k.send_back
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -99,7 +99,7 @@ class Home_c extends CI_Controller
             on a.id = u.job_list_id
             where b.status_aktif = 1 and u.user_name = '$username' 
             union
-            SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan , k.status status_individu, null,null,u.mapping_by, u.user_name nip,'delegate' status_del_read,u.status status_read
+            SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama,e.jabatan , k.status status_individu, null,null,u.mapping_by, u.user_name nip,'delegate' status_del_read,u.status status_read,k.send_back
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -142,7 +142,7 @@ class Home_c extends CI_Controller
             $data_branch = $this->db->query($get_branch)->row();
             $get_singkatan = "SELECT distinct singkatan from branch where id_branch = '$data_branch->branch'";
             $data_singkatan = $this->db->query($get_singkatan)->row();
-            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,b.nama,e.jabatan,b.status, k.status status_akhir ,$jabatan as role
+            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,b.nama,e.jabatan,b.status, k.status status_akhir ,$jabatan as role,k.delegate_to
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -175,7 +175,7 @@ class Home_c extends CI_Controller
         } else {
             $username = $_SESSION['username'];
             
-            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama , k.status status_individu, u.mapping_by, u.user_name nip,'read' status_del_read,u.status status_read
+            $query = "SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama , k.status status_individu, u.mapping_by, u.user_name nip,'read' status_del_read,u.status status_read,k.send_back
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -195,7 +195,7 @@ class Home_c extends CI_Controller
             on a.id = u.job_list_id
             where b.status_aktif = 1 and u.user_name = '$username' 
             union
-            SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama , k.status status_individu, u.mapping_by, u.user_name nip,'delegate' status_del_read,u.status status_read
+            SELECT distinct a.id, a.job_name,g.job_title,a.position_id,c.position_name,d.user_name,d.nama , k.status status_individu, u.mapping_by, u.user_name nip,'delegate' status_del_read,u.status status_read,k.send_back
             from list_jobs a
             inner join posisi c
             on a.position_id = c.position_id
@@ -303,6 +303,26 @@ class Home_c extends CI_Controller
         $data_update = ['status' => $data['status']];
         // cek kode 
         $save = $this->training_parameter->update($data['id'],$data_update,'mapping_job','job_list_id');
+        
+        if ($save == true) {
+            $msg = 'Berhasil di Simpan';
+        }else{
+            $msg = 'Gagal Menyimpan';
+        }
+
+        echo $msg;
+    }
+
+    function send_back_save(){
+      
+        foreach($_POST as $key => $val){
+            $data[$key] = $val;
+        }
+        $data_job = $this->training_parameter->where($data['delegate'],'status_job_profile','job_list_id')->row();
+        // var_dump($data,$data_job->job_list_id);die;
+        // cek kode 
+        $data_update = ['send_back' => $data_job->delegate_to, 'status' => null];
+        $save = $this->training_parameter->update($data_job->job_list_id,$data_update,'status_job_profile','job_list_id');
         
         if ($save == true) {
             $msg = 'Berhasil di Simpan';
@@ -611,10 +631,14 @@ class Home_c extends CI_Controller
         $kode_job_function = 'Y';
         $field_job_function = 'flagactive';
         
+        $data['send_back'] = $this->training_parameter->where($position_id,'status_job_profile','job_list_id')->row();
+        // var_dump($data['send_back']);die;
+
         $data['id_job'] = $this->training_parameter->join_2_distinct(
             $table_listjob,$table_posisi,$table,$on3,$on3,$on1,$on2
             ,$field_id,$position_id,'list_jobs.id,job.id_job,job.job_title,posisi.position_name'
         )->row();
+
         $data['work_experience'] = $this->training_parameter->get_($table_workexperience)->result_array();
         $data['tingkat_pendidikan'] = $this->training_parameter->where_null($table_tingkatpendidikan,$field_hide,'id,edu_name')->result_array();
 
@@ -709,6 +733,36 @@ class Home_c extends CI_Controller
 
         echo $msg;
     }
+    
+    function send_admin(){
+        foreach($_POST as $key => $val){
+            $data[$key] = $val;
+        }
+        // var_dump($data);die;
+        $search = $this->training_parameter->where($data['delegate'],'status_job_profile','job_list_id')->num_rows();
+        if ($search > 0) {
+            $data_update = ['status' => 0];
+            $save = $this->training_parameter->update($data['delegate'],$data_update,'status_job_profile','job_list_id');
+        } else {
+            $data_job = $this->training_parameter->where($data['delegate'],'list_jobs','id')->row();
+            $now = date('Y-m-d H:i:s');
+            $data_arr = array(
+                'job_list_id' => $data_job->id,
+                'status' => 0,
+                'created_at' => $now,
+            );
+            
+            $save = $this->training_parameter->save($data_arr, 'status_job_profile');
+        }
+        
+        if ($save == true) {
+            $msg = 'Berhasil di Simpan';
+        }else{
+            $msg = 'Gagal Menyimpan';
+        }
+        echo $msg;
+    }
+
     function saving(){
         $table = 'tujuan_jabatan';
         $field = 'id';
@@ -980,6 +1034,9 @@ class Home_c extends CI_Controller
             $data[$key] = $val;
         }
 
+        // $user_name = $_SESSION['username'];
+        // $verify_vals = ['user_name' => $user_name];
+        // $this->training_parameter->update($data['position_id'],$verify_vals,'list_jobs','id'); 
         $id_job_prof = ['status' => '3'];
         $save = $this->training_parameter->update($data['position_id'],$id_job_prof,'status_job_profile','job_list_id');
 

@@ -37,8 +37,16 @@
                         </div>
                     </div>
                     <div class="">
-                        <button type="button" data="" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end" style="margin-left: 10px">Send Back</button>
-                        <button type="button" data="" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end">Approve</button>
+                        <?php if($send_back->status == '0' && $send_back->delegate_to != null) {?>
+                            <button type="button" style="cursor:default" class="btn btn-success btn-sm float-end">Sent to Admin</button>
+                        <?php } else if($send_back->status == null && $send_back->delegate_to != null) {?>
+                            <button type="button" style="cursor:default" class="btn btn-success btn-sm float-end">Waiting Send to Delegate</button>
+                        <?php } else if($send_back->status == 1) {?>
+                            <button type="button" style="cursor:default" class="btn btn-success btn-sm float-end">Approve</button>
+                        <?php } else { ?>
+                            <button type="button" data="send_back" data_delegate="<?php echo (( $send_back)? $send_back->job_list_id : '' ) ?>" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end" style="margin-left: 10px">Send Back</button>
+                            <button type="button" data="modal_send_admin" data_delegate="<?php echo (( $send_back)? $send_back->job_list_id : '' ) ?>" onclick="action_submit(this)" class="btn btn-primary btn-sm float-end">Approve</button>
+                        <?php }  ?>
                     </div>
                 </div>
             </div>
